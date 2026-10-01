@@ -1,0 +1,6 @@
+# Governance and enforcement changes require project-owner review when
+# GitHub rules are configured to require Code Owner approval.
+/governance/ @FJ899
+/.github/workflows/ @FJ899
+/AGENTS.md @FJ899
+/research/records/ @FJ899

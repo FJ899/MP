@@ -53,6 +53,16 @@ Input:
 Candidate:
 rehanguha/brisque at M1 pinned commit.
 
+Default model dependencies:
+- brisque/models/svm.txt
+- brisque/models/normalize.pickle
+
+Precondition before execution:
+- resolve provenance/terms for the bundled default SVM + normalization artifacts, OR
+- supply a custom BRISQUE model with pinned acceptable provenance/terms.
+
+This precondition does not authorize training.
+
 Output:
 - BRISQUE score per frame;
 - provenance linking score to source frame.

@@ -1,0 +1,30 @@
+{
+  "record_version": 1,
+  "component_id": "replace-me",
+  "problem": "Exact unresolved function.",
+  "vertical_search": {
+    "date": "YYYY-MM-DD",
+    "status": "DONE",
+    "queries": [
+      "near-end-to-end system query"
+    ],
+    "candidates": []
+  },
+  "horizontal_search": {
+    "date": "YYYY-MM-DD",
+    "status": "DONE",
+    "queries": [
+      "exact component implementation query"
+    ],
+    "candidates": []
+  },
+  "inspected_candidates": [],
+  "comparison_summary": "What existing solutions do and where the actual gap remains.",
+  "integration_role": "COMPONENT",
+  "decision": "ADAPT",
+  "replaces_what": "What custom work this candidate may remove.",
+  "why": "Decision rationale grounded in evidence.",
+  "build_justification": "",
+  "review_status": "PENDING",
+  "human_decision": "PENDING"
+}

@@ -147,3 +147,33 @@ A PASS review does NOT:
 - authorize flight/route actions.
 
 After review, HUMAN decides whether to accept M1 result and authorize any next phase.
+
+
+## Focused repair review — MP-M1-001
+
+Source review:
+MP/m1-review-001/AI-B
+
+Verify the following correction only:
+
+1. BRISQUE source code/repository license is recorded separately from its bundled default runtime artifacts.
+2. audits/quality-gate.md records:
+   - brisque/models/svm.txt,
+   - brisque/models/normalize.pickle,
+   - constructor loading behavior,
+   - artifact provenance/terms = UNRESOLVED.
+3. research/PINNED_SOURCES.md and REPO_RADAR.md no longer imply that Apache-2.0 alone resolves the complete default runtime model chain.
+4. M2-02 cannot execute with the default BRISQUE model until:
+   - bundled artifact provenance/terms are resolved, or
+   - a custom model with pinned acceptable provenance/terms is provided.
+5. D3 and D5 in M1_RESULT.md are corrected consistently.
+6. evidence/M1_RECON_EVIDENCE.md records exact default artifact identities and does not claim either that Apache-2.0 covers them or that it excludes them.
+
+This repair does not require:
+- installation,
+- training,
+- replacing BRISQUE,
+- reopening broad reconnaissance,
+- M2 execution.
+
+Non-blocking notes N01–N05 remain notes unless they expose a separate violated M1 DONE criterion.

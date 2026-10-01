@@ -1,11 +1,22 @@
 {
   "change_id": "MP-CR-XXX",
-  "description": "Implementation change being authorized.",
-  "scope": [
-    "components/example/**"
+  "change_kind": "MAJOR",
+  "component_id": "example-component",
+  "description": "Exact implementation change being authorized.",
+  "repair_of": "",
+  "authorized_files": [
+    "components/example/adapter.py",
+    "tests/test_example.py"
   ],
-  "research_record": "research/records/example.json",
+  "research_record": "research/records/example-component.json",
+  "research_record_sha256": "REPLACE_WITH_SHA256_OF_RESEARCH_RECORD",
   "authorized_decision": "ADAPT",
+  "authorization": {
+    "decision_id": "HUMAN-DECISION-ID",
+    "source": "HUMAN_PROJECT_DECISION",
+    "state_version": 1,
+    "subject_version": "SUBJECT_OR_PACKET_VERSION"
+  },
   "review_status": "PENDING",
   "human_decision": "PENDING"
 }

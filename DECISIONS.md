@@ -24,3 +24,27 @@ No orchestrator architecture is frozen before real I/O, dependencies and constra
 - whether VLM belongs in first executable smoke test
 - exact YOLO model/weights
 - exact telemetry parser
+
+## D-007 — Vertical + horizontal search before major component design
+Human decision: before designing a major component, run both:
+- VERTICAL SEARCH for near-end-to-end systems,
+- HORIZONTAL SEARCH for implementations of the exact component.
+
+## D-008 — BUILD is the last option
+Human decision: the default sequence is PROBLEM -> SEARCH EXISTING SOLUTIONS -> INSPECT/RUN -> COMPARE -> BORROW/ADAPT/BUILD. Custom implementation requires evidence that reuse/adaptation is insufficient.
+
+## D-009 — Repository role classification
+Human decision: repositories are classified as DEPENDENCY, COMPONENT, REFERENCE_IMPLEMENTATION, BENCHMARK or REJECTED. Evaluation status/decision is tracked separately as EVALUATE, USE, ADAPT, LEARN, REJECT or PARK.
+
+## D-010 — Durable rejection rationale
+Human decision: rejected solutions remain recorded with WHY and evidence so later work can explain why a custom solution exists.
+
+## D-011 — Architecture freeze follows reconnaissance
+Human decision: one Technology Reconnaissance pass around the current MP architecture must complete before MP Architecture v0.1 is frozen.
+
+## D-012 — YOLO is a candidate, not an architectural decision
+Human decision: detector selection must be informed by task-relevant benchmarks/datasets; YOLO is one candidate alongside alternatives such as RT-DETR or other methods supported by evidence.
+
+## Working hypothesis — VLM authority
+Source-derived hypothesis to test, not yet a frozen human decision:
+use the detector/anomaly model as the source of detection verdict and treat VLM output as interpretation/explanation unless MP evidence later justifies a stronger role.

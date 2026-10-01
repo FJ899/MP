@@ -26,14 +26,39 @@ PROBLEM
 → USE/ADAPT/LEARN/REJECT/PARK
 → BUILD only when justified.
 
-If either search is missing, STOP BUILD and create/update the research record.
+If either search is missing, STOP BUILD and create/update the Research Record.
 
 If a suitable existing solution is found, prefer USE or ADAPT unless evidence supports BUILD.
 
-## Never infer acceptance
+## Build Request rule
 
-AI review PASS is not HUMAN acceptance.
-A proposed dependency, architecture, model, schema or build path remains proposed until the project state/decision record says otherwise.
+Protected implementation work requires a per-change Build Request.
+
+Do not rely on a historical broad permission.
+
+Every current protected file must be listed exactly in:
+`authorized_files`
+
+Globs such as `src/**` are not valid authorization.
+
+A NARROW_REPAIR may reuse an already accepted Research Record and does not require repeating Vertical/Horizontal search, provided the repair does not reopen the component/model/dependency/contract choice.
+
+The Build Request must preserve the real human authorization provenance:
+- decision_id
+- source
+- state_version
+- subject_version
+
+Never invent ACCEPTED status.
+
+## Unknown implementation location
+
+Moving executable code outside the expected layout does not bypass Research Gate.
+
+Examples that remain protected:
+- main.py
+- tools/new_detector.py
+- governance/evil.py
 
 ## Evidence
 

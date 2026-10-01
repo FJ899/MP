@@ -1,17 +1,18 @@
 # STATE
 
 protocol: TWO-WEBAI/0.2
-project_id: FRANKENSTEIN_INSPECTION_LAB
-state_version: 1
+project_id: MP
+state_version: 2
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT
+changed_fields: project_id, project terminology, state_version
 
 ## Approved goal
 Sprawdzić, czy z istniejących narzędzi można złożyć minimalne laboratorium, które przyjmuje materiał z lotu inspekcyjnego, analizuje go kilkoma komplementarnymi metodami, łączy wyniki i przekazuje operatorowi ograniczoną listę miejsc CONFIRM / REJECT / RECHECK.
 
 Hipoteza:
-> Czy Frankenstein wyławia z 30 minut filmu miejsca, którym człowiek rzeczywiście powinien przyjrzeć się ponownie?
+> Czy MP wyławia z 30 minut filmu miejsca, którym człowiek rzeczywiście powinien przyjrzeć się ponownie?
 
 ## Approved scope
 CURRENT:

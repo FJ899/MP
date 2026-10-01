@@ -1,105 +1,263 @@
-# COMPONENT CANDIDATES
+# COMPONENT CANDIDATES — M1 Synthesis
 
-This file maps MP problem areas to existing solutions before custom design.
+Status: CANDIDATE_SET_READY_FOR_REVIEW
+Architecture freeze: NOT_READY
+
+This file maps each MP problem area to existing solutions after the first targeted Technology Reconnaissance pass.
 
 ## 1. Video ingestion
-Current candidates:
+
+Search status:
+COMPLETE FOR M1 FIRST PASS.
+
+Inspected:
 - FFmpeg
 - OpenCV
+- PySceneDetect
+- PyAV
+- VidGear
 
-Recon status:
-HORIZONTAL SEARCH NOT YET COMPLETE.
-Do not design a custom ingestion framework before checking mature video->frames/events pipelines.
+Proposed M2 evaluation:
+FFmpeg + OpenCV.
+
+PARK:
+PySceneDetect, PyAV, VidGear.
+
+Reason:
+no evidence that a custom or broader ingestion framework improves the RECHECK hypothesis.
+
+Audit:
+audits/video-ingestion.md
 
 ## 2. Quality gate
-Candidates:
-- fwan133/IIQC — LEARN
-- GattuPriyanka/Framework-for-UAV-image-quality — EVALUATE
 
-Open question:
-What is the minimum quality gate needed for MP's first post-flight experiment versus IIQC's much richer bridge/pose framework?
+Search status:
+COMPLETE FOR M1 FIRST PASS.
+
+Inspected:
+- IIQC
+- Framework-for-UAV-image-quality
+- rehanguha/brisque
+
+Proposed M2:
+BRISQUE as one existing licensed quality signal on manually obvious good/bad frames.
+
+LEARN:
+IIQC architecture and simple blur/exposure metric families.
+
+PARK as direct dependency:
+IIQC and Framework-for-UAV-image-quality because of scope/licensing concerns.
+
+No operational quality threshold is selected.
+
+Audit:
+audits/quality-gate.md
 
 ## 3. Anomaly path
-Candidates:
-- open-edge-platform/anomalib / PatchCore
-- AliAbdien/AI-Visual-Inspector
-- InsPLAD as UAV anomaly benchmark/reference
 
-Working hypothesis:
-anomaly detector decides anomaly/no-anomaly;
-VLM explains/localizes/labels in natural language but does not vote on existence of defect unless evidence later supports that role.
+Search status:
+SUFFICIENT FOR M1 FIRST PASS.
 
-## 4. Defect detector
-Candidates/benchmarks:
-- BFD-UAV2K
+Candidate:
+open-edge-platform/anomalib / PatchCore.
+
+Reference:
+AI-Visual-Inspector.
+
+Proposed M2:
+small PatchCore normal-reference experiment.
+
+Authority hypothesis:
+detector/anomaly model decides anomaly evidence;
+VLM may later explain but does not override the detector in the first design hypothesis.
+
+Unresolved:
+pretrained backbone/model-license chain must be pinned before execution.
+
+## 4. Known-defect detector
+
+Search status:
+COMPLETE FOR M1 FIRST PASS; EXECUTION PRECONDITION UNRESOLVED.
+
+Benchmark:
+BFD-UAV2K.
+
+Candidate families evidenced by benchmark:
 - YOLO family
 - RT-DETR
-- Faster R-CNN / Cascade R-CNN as benchmark baselines
-- FBD classification ensemble — different task, reference only
-- UAV crack detection/segmentation benchmark
+- Faster R-CNN
+- Cascade R-CNN
+
+Framework candidate:
+Ultralytics.
+
+Optional later mode:
+SAHI sliced inference.
+
+M2:
+BLOCKED until task-relevant weights/checkpoint + acceptable license are identified or HUMAN authorizes a deliberately scoped training experiment on suitably licensed data.
 
 Important:
-YOLO is not frozen. BFD-UAV2K reports materially different trade-offs between YOLO and RT-DETR on a problem much closer to MP than generic benchmarks.
+generic COCO YOLO is not accepted as facade-defect validation.
+
+Audit:
+audits/detector-selection.md
 
 ## 5. Segmentation / tracking
-Current candidate:
-- facebookresearch/sam2
 
-HORIZONTAL SEARCH:
-INCOMPLETE.
-Need alternatives before freezing SAM2.
+Search status:
+COMPLETE FOR M1 FIRST PASS.
+
+Inspected:
+- SAM2
+- Cutie
+- XMem
+- DEVA
+- Track-Anything
+- CoTracker discovery
+
+Proposed M2:
+SAM2.1 Hiera Small with a supplied candidate box on one short clip.
+
+LEARN:
+DEVA detector→temporal-fusion architecture.
+
+PARK:
+Cutie/XMem/Track-Anything unless SAM2 smoke exposes a real gap.
+
+Audit:
+audits/segmentation-tracking.md
 
 ## 6. Merger / temporal event clustering
-Reference mechanisms:
-- Hawk-I per-class NMS / verification flow
-- AegisInspect persistent defect aggregation and repeated-observation association
 
-HORIZONTAL SEARCH:
-INCOMPLETE.
-Need dedicated multi-model/temporal fusion search before custom merger design.
+Search status:
+COMPLETE FOR M1 FIRST PASS, WITH AN EXPLICIT INTEGRATION GAP.
+
+Inspected:
+- Weighted Boxes Fusion
+- Norfair
+- ByteTrack
+- DEVA
+- tank-inspection-uav spatial aggregator
+- AegisInspect persistence patterns
+- Hawk-I NMS/integration patterns
+
+Solved subproblems:
+- same-frame box fusion: WBF/NMS
+- temporal association: Norfair/SAM2/DEVA patterns
+- later coordinate-space dedup: spatial registry patterns
+
+No inspected repo directly solves:
+provenance-preserving CandidateEvent construction for static surface defects seen repeatedly by a moving UAV camera.
+
+Proposed M2:
+- WBF semantics smoke
+- Norfair moving-camera association smoke
+- compare with SAM2 persistence evidence
+- only then revise Observation/CandidateEvent contract.
+
+Audit:
+audits/merger-temporal.md
 
 ## 7. Telemetry
+
+Search status:
+COMPLETE FOR M1 FIRST PASS.
+
 Candidates:
-- FergusInLondon/dji_parse — MP4 subtitle telemetry
-- jetervaz/dji-telemetry — SRT telemetry + time lookup
-- AiryAir/dji-srt2csv — simple multi-format SRT conversion
-- aero-oli/DatCon — richer .DAT path but compatibility risk on newer/encrypted logs
+- FergusInLondon/dji_parse
+- jetervaz/dji-telemetry
+- AiryAir/dji-srt2csv
+- aero-oli/DatCon
 
-Key experiment before any custom parser:
-Does an actual Air 3S recording/log produced in our workflow contain compatible SRT/subtitle telemetry with the fields MP needs?
+Current uncertainty:
+actual Air 3S recording/log format and available fields.
 
-## 8. Route generation / recheck mission
+Status:
+PARK / NON-BLOCKING.
+
+First later test:
+inspect one actual Air 3S output file/log before selecting a parser.
+
+## 8. Route generation
+
+Search status:
+COMPLETE FOR M1 FIRST PASS.
+
 Candidates:
 - BanaanKiamanesh/WayPoint
 - fcsonline/droneroute
 - jamiepinkham/drone-mission-planning
 
-Current facts:
-- WayPoint README explicitly lists Air 3S support.
-- DroneRoute supports WPML/KMZ and controller upload, but its current README supported-drone list does not include Air 3S.
-- drone-mission-planning contains Air 3S-specific file-format research but explicitly awaits calibration/validation with a real Air 3S dummy mission.
+Findings:
+- WayPoint README explicitly claims Air 3S support.
+- DroneRoute provides WPML/KMZ/controller transfer but current support list does not establish Air 3S.
+- drone-mission-planning contains Air 3S-specific format research but says calibration against a real Air 3S dummy mission is still required.
 
-Therefore:
-custom KMZ generator is not justified before testing/inspecting these candidates.
+Status:
+PARK.
+No custom KMZ generator is justified.
 
 ## 9. Recheck / recollection
-Relevant references:
-- IIQC for image recollection trigger
-- route-generation candidates above
 
-Dedicated search:
-INCOMPLETE.
+Search status:
+COMPLETE FOR M1 FIRST PASS, INCLUDING RECORDED DIRECT NO_RESULT QUERIES + BROADER DISCOVERY.
+
+References:
+- IIQC — quality failure→recollection
+- carloscs04/uav-vision-pipeline-inspection — logged flagged coordinates→targeted second inspection
+- EdwinTSalcedo/RDMO-DigitalTwin — Baseline/Hover/Micro/Skip-revisit recovery policies
+
+Status:
+LEARN.
+
+First MP proof:
+RECHECK can remain a human-facing source interval/frame/reason without autonomous route execution.
+
+Audit:
+audits/recheck-recollection.md
 
 ## 10. Whole system
-Vertical references:
-- Arvoxis/hawk-i
-- AritraAcherjee/autonomous-drone-infrastructure-inspection
 
-Purpose:
-identify already-solved integration, provenance, aggregation and human-review mechanisms; do not clone their entire scope.
+Search status:
+COMPLETE FOR M1 FIRST PASS.
+
+Vertical references:
+- Hawk-I
+- AegisInspect
+- dual-UAV pipeline inspection
+- RDMO Digital Twin
+- tank-inspection-uav
+
+Use:
+integration patterns, evidence boundaries, persistence, dedup and reinspection semantics.
+
+Do not import:
+ROS/LiDAR/edge/autonomy/3D merely because references contain them.
+
+## Proposed first M2 candidate set
+
+- FFmpeg
+- OpenCV
+- BRISQUE
+- Anomalib/PatchCore
+- SAM2.1 Hiera Small
+- Weighted Boxes Fusion
+- Norfair
+
+Not in first M2 executable set:
+- known-defect detector: BLOCKED by checkpoint/license precondition
+- VLM: PARK
+- CVAT: PARK
+- telemetry: PARK
+- route generation: PARK
+- COLMAP/3D: PARK
+
+See:
+M2_SMOKE_TEST_PLAN.md
 
 ## Architecture freeze gate
-MP Architecture v0.1 remains NOT READY TO FREEZE until:
-- each section above has a recorded reconnaissance result,
-- strongest candidates have source-level suitability findings,
-- custom BUILD items identify the gap that existing solutions did not close.
+
+MP Architecture v0.1 remains NOT READY TO FREEZE.
+
+M1 output now identifies candidates and gaps, but no USE/ADAPT/BUILD choice becomes HUMAN_ACCEPTED until independent M1 review and subsequent HUMAN decision.

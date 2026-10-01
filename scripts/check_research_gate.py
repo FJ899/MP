@@ -357,6 +357,12 @@ def validate_research_record(path: Path) -> tuple[dict | None, list[str]]:
     if data.get("human_decision") != "ACCEPTED":
         errors.append(f"{path.relative_to(ROOT)}: human_decision must be ACCEPTED")
 
+    validate_authorization(
+        data.get("human_acceptance"),
+        f"{path.relative_to(ROOT)}.human_acceptance",
+        errors,
+    )
+
     return data, errors
 
 

@@ -26,6 +26,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Run Research Gate regression tests
+        run: python tests/test_research_gate.py
+
       - name: Determine comparison range
         id: range
         shell: bash
@@ -44,6 +47,4 @@ jobs:
 
       - name: Run MP Research Gate
         run: |
-          python scripts/check_research_gate.py \
-            "${{ steps.range.outputs.base }}" \
-            "${{ steps.range.outputs.head }}"
+          python scripts/check_research_gate.py             "${{ steps.range.outputs.base }}"             "${{ steps.range.outputs.head }}"

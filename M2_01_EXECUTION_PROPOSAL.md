@@ -4,7 +4,7 @@ status:
 HUMAN_DECISION_REQUIRED
 
 proposal_revision:
-2
+3
 
 experiment_id:
 M2-01
@@ -241,6 +241,69 @@ For every decoded frame derive/store:
 
 Never replace a missing raw PTS field with best_effort_timestamp under the same column/name.
 
+## Step 3A — Check timestamp behavior in original enumeration order
+
+Before any sorting or presentation_ordinal derivation, inspect the selected timestamp field in increasing:
+
+    enumeration_ordinal
+
+This is the integrity check for the original decoded-frame enumeration.
+
+For each frame, preserve:
+
+- enumeration_ordinal,
+- selected timestamp kind,
+- selected timestamp raw integer where applicable,
+- selected timestamp_time,
+- previous usable timestamp and its enumeration_ordinal,
+- delta to the previous usable timestamp,
+- anomaly classification.
+
+Required anomaly classes:
+
+### MISSING
+
+Selected timestamp is absent for this frame.
+
+Record the frame ordinal and do not silently substitute another timestamp kind.
+
+### DUPLICATE
+
+Current selected timestamp equals the previous usable selected timestamp.
+
+A duplicate does NOT automatically fail M2-01 if frame identity remains unambiguous through enumeration_ordinal and the later extraction evidence is consistent.
+
+### REGRESSION
+
+Current selected timestamp is lower than the previous usable selected timestamp.
+
+Every regression must be preserved with both ordinals and both timestamp values.
+
+A regression requires diagnosis before PASS.
+Sorting later MUST NOT erase or neutralize this evidence.
+
+### FORWARD
+
+Current selected timestamp is greater than the previous usable timestamp.
+
+Proposed evidence:
+
+- timestamp_anomalies_run1.csv
+- timestamp_anomalies_run2.csv
+
+At minimum each row should preserve:
+
+- run ID,
+- anomaly type,
+- current enumeration_ordinal,
+- previous usable enumeration_ordinal,
+- current timestamp,
+- previous timestamp,
+- delta,
+- timestamp kind.
+
+Sorting into presentation_ordinal is performed only after this integrity scan.
+
 ## Step 4 — Choose one timestamp basis for sample selection
 
 Selection-basis rule:
@@ -334,7 +397,7 @@ For one selected sample with:
 
 proposed extraction command:
 
-    ffmpeg -hide_banner -loglevel info       -copyts       -i "$INPUT"       -map 0:"$STREAM_INDEX"       -vf "select='eq(n\,$N)',showinfo"       -fps_mode passthrough       -frames:v 1       -an -sn -dn       -c:v png       "$OUT_PNG"       2> "$OUT_LOG"
+    ffmpeg -hide_banner -loglevel info       -copyts       -i "$INPUT"       -map 0:"$STREAM_INDEX"       -vf "select='eq(n\,$N)',format=rgb24,showinfo"       -fps_mode passthrough       -frames:v 1       -an -sn -dn       -c:v png       "$OUT_PNG"       2> "$OUT_LOG"
 
 Repeat the same command structure for all five samples.
 
@@ -347,28 +410,56 @@ Why these options are explicit:
 - -fps_mode passthrough avoids intentional CFR duplication/drop behavior;
 - -frames:v 1 limits output to the selected frame;
 - -copyts avoids deliberately rebasing timestamps to zero;
+- format=rgb24 makes the pixel format written to PNG explicit;
 - showinfo records the selected decoded frame's runtime PTS/time evidence.
 
 The showinfo record must be compared with the selected frame record.
 Any mismatch is evidence, not something to normalize away.
 
-## Step 8 — Decoded-pixel hash
+## Step 8 — Source-frame decoded-pixel hash
 
 PNG file bytes are not the primary pixel-identity proof.
 
-For the same selected frame, calculate a hash of a standardized decoded pixel representation.
+For the same selected source frame, hash the exact standardized RGB24 rawvideo bytes.
 
 Proposed command:
 
-    ffmpeg -v error       -copyts       -i "$INPUT"       -map 0:"$STREAM_INDEX"       -vf "select='eq(n\,$N)',format=rgb24"       -fps_mode passthrough       -frames:v 1       -an -sn -dn       -f hash       -hash sha256       -
+    ffmpeg -v error       -copyts       -i "$INPUT"       -map 0:"$STREAM_INDEX"       -vf "select='eq(n\,$N)',format=rgb24"       -fps_mode passthrough       -frames:v 1       -an -sn -dn       -f rawvideo       -pix_fmt rgb24       -       | sha256sum
 
-Record the returned SHA-256 as:
+Record as:
 
-decoded_rgb24_sha256
+source_decoded_rgb24_sha256
 
 for Run A and Run B.
 
-This tests decoded pixel equality independently of PNG container/encoder bytes.
+Also retain source-frame width and height from the enumerated frame record.
+
+This hash represents the standardized decoded source-frame pixels.
+
+## Step 8B — Decode the saved PNG back to RGB24
+
+The evidence chain must also prove that the PNG stored in the evidence package contains the same pixels as the selected source frame.
+
+First record PNG dimensions:
+
+    ffprobe -v error       -select_streams v:0       -show_entries stream=width,height,pix_fmt       -of json       "$OUT_PNG"       > "$PNG_PROBE_JSON"
+
+Then decode that PNG to explicit RGB24 rawvideo and hash the raw bytes:
+
+    ffmpeg -v error       -i "$OUT_PNG"       -map 0:v:0       -vf "format=rgb24"       -frames:v 1       -f rawvideo       -pix_fmt rgb24       -       | sha256sum
+
+Record as:
+
+saved_png_decoded_rgb24_sha256
+
+For each sample require comparison of:
+
+- source frame width/height,
+- saved PNG decoded width/height,
+- source_decoded_rgb24_sha256,
+- saved_png_decoded_rgb24_sha256.
+
+If these pixel hashes differ, the saved PNG is not proven to contain the same standardized RGB24 pixels as the selected source frame and requires diagnosis.
 
 ## Step 9 — PNG file hash
 
@@ -384,7 +475,7 @@ This is a secondary reproducibility measure.
 
 Different PNG SHA-256 values do NOT automatically mean different decoded pixels.
 
-## Step 10 — Three separate comparisons
+## Step 10 — Four separate comparisons
 
 ### A. Source → stream → frame → timestamp identity
 
@@ -405,36 +496,55 @@ Compare Run A / Run B:
 
 This is the primary provenance test.
 
-### B. Decoded-pixel equality
+### B. Source decoded-pixel equality across runs
 
 Compare:
 
-decoded_rgb24_sha256
+source_decoded_rgb24_sha256
 
-for each corresponding sample.
+for each corresponding sample in Run A vs Run B.
 
-Matching hashes mean the standardized decoded pixels are identical for that sample under the compared runs.
+Matching hashes mean the standardized decoded source-frame pixels are identical across repeated source decoding.
 
-### C. PNG byte equality
+### C. Source frame → saved PNG pixel equality
+
+Within each run compare:
+
+source_decoded_rgb24_sha256
+
+against:
+
+saved_png_decoded_rgb24_sha256
+
+and compare source dimensions against PNG decoded dimensions.
+
+This is the direct evidence that the PNG retained in the evidence package contains the same standardized RGB24 pixel matrix as the selected source frame.
+
+### D. PNG byte equality
 
 Compare:
 
-png_file_sha256.
+png_file_sha256
+
+between Run A and Run B.
 
 Interpretation:
 
-- A same + B same + C same:
+- A same + B same + C same + D same:
   strongest reproducibility observation.
 
+- A same + B same + C same + D different:
+  source identity and saved PNG pixels remain consistent;
+  investigate PNG encoder/metadata/output-byte differences.
+
 - A same + B same + C different:
-  do NOT claim a different source frame;
-  investigate PNG encoding/metadata/output-byte differences.
+  saved evidence PNG does not match the selected source-frame pixels; diagnose before PASS.
 
 - A same + B different:
-  decoded-pixel reproducibility problem requiring diagnosis.
+  repeated source decoding does not reproduce the same standardized pixels; diagnose before PASS.
 
 - A different:
-  source/frame/timestamp mapping reproducibility problem regardless of PNG hash.
+  source/frame/timestamp mapping reproducibility problem regardless of later pixel/file hashes.
 
 ## PASS criteria
 
@@ -447,12 +557,15 @@ PASS for one native Air 3S input requires:
 5. the selected timestamp kind explicitly recorded;
 6. T_min/T_max derived from actual selected-stream frame timestamps, not assumed zero;
 7. both probe runs reproduce the relevant source→stream→frame→timestamp mapping;
-8. selected presentation timestamps do not reverse after applying the declared presentation ordering;
-9. all five target percentages choose the same frame identities in both probe runs;
-10. exact extraction by enumeration_ordinal yields showinfo evidence consistent with the selected frame;
-11. Run A and Run B decoded_rgb24_sha256 match for all five samples;
-12. any PNG-byte mismatch with matching decoded pixels is separately diagnosed and does not by itself fail frame identity;
-13. every sample is traceable to:
+8. timestamp integrity is evaluated in original enumeration_ordinal order before sorting; all MISSING, DUPLICATE and REGRESSION events are preserved with ordinals and values;
+9. every timestamp REGRESSION is diagnosed and cannot be silently hidden by later presentation sorting before PASS;
+10. DUPLICATE timestamps are allowed only when frame identity remains unambiguous through ordinal evidence and exact extraction;
+11. all five target percentages choose the same frame identities in both probe runs;
+12. exact extraction by enumeration_ordinal yields showinfo evidence consistent with the selected frame;
+13. Run A and Run B source_decoded_rgb24_sha256 match for all five samples;
+14. for every saved evidence PNG, saved_png_decoded_rgb24_sha256 equals the corresponding source_decoded_rgb24_sha256 and decoded dimensions match the selected source-frame dimensions;
+15. any PNG-byte mismatch with matching source and saved-PNG decoded pixels is separately diagnosed and does not by itself fail frame identity;
+16. every sample is traceable to:
     input SHA-256
     + stream index
     + enumeration ordinal
@@ -475,8 +588,9 @@ FAIL if an authorized run produces a repeatable defect that undermines auditable
 - repeated probe runs produce different frame/timestamp identities;
 - selected sample rules choose different frame identities across identical runs;
 - exact ordinal extraction does not correspond to the enumerated selected frame;
-- presentation identity reverses/corrupts in a way that cannot support RECHECK provenance;
-- identical mapped frame identity produces different decoded_rgb24_sha256 values without an explainable environment/input change;
+- timestamp regression in original enumeration order remains unexplained and undermines RECHECK provenance;
+- exact extraction or saved-PNG decoding does not preserve the selected source-frame RGB24 pixel identity;
+- identical mapped frame identity produces different source_decoded_rgb24_sha256 values without an explainable environment/input change;
 - the source cannot be decoded sufficiently to preserve auditable frame identity.
 
 Different PNG file SHA alone is NOT sufficient for FAIL when decoded pixels match.
@@ -518,12 +632,18 @@ Proposed files:
 - frames_run1.json
 - frames_run2.json
 - selected_samples.csv
+- timestamp_anomalies_run1.csv
+- timestamp_anomalies_run2.csv
 - extracted/runA/*.png
 - extracted/runB/*.png
 - extraction_showinfo_runA/*.log
 - extraction_showinfo_runB/*.log
-- decoded_pixel_hashes_runA.txt
-- decoded_pixel_hashes_runB.txt
+- png_probe_runA/*.json
+- png_probe_runB/*.json
+- source_decoded_pixel_hashes_runA.txt
+- source_decoded_pixel_hashes_runB.txt
+- saved_png_decoded_pixel_hashes_runA.txt
+- saved_png_decoded_pixel_hashes_runB.txt
 - png_hashes_runA.txt
 - png_hashes_runB.txt
 - RESULT.md
@@ -568,10 +688,12 @@ one short native Air 3S clip plus CPU/storage for complete frame probing and ten
 2. Runtime FFmpeg package identity must be preserved; M1 source pin is not runtime identity.
 3. best_effort_timestamp is explicitly an estimated field and is not raw PTS.
 4. Frame ordinal, PTS, best-effort timestamp and timebase are separate evidence fields.
-5. Variable frame rate or timestamp irregularity is observed, not silently normalized.
-6. No telemetry is tested.
-7. No AI model is tested.
-8. Substitute video cannot validate Air 3S compatibility.
+5. Variable frame rate or timestamp irregularity is inspected first in enumeration order and preserved before any presentation sorting.
+6. Sorting is permitted for deterministic sample selection only and is never evidence that the original enumeration was monotonic.
+7. Saved PNG evidence is validated by decoding it back to RGB24 and comparing pixels/dimensions with the selected source frame.
+8. No telemetry is tested.
+9. No AI model is tested.
+10. Substitute video cannot validate Air 3S compatibility.
 
 ## Decision after M2-01
 
@@ -596,8 +718,10 @@ Permits:
 - two frame enumerations,
 - selecting five frames using the declared T_min/T_max rule,
 - two exact ordinal-based extraction runs,
-- decoded-pixel hashes,
-- PNG hashes,
+- enumeration-order timestamp anomaly records,
+- source-frame RGB24 hashes,
+- saved-PNG decoded RGB24 hashes and dimension checks,
+- PNG byte hashes,
 - evidence package.
 
 Does NOT permit:

@@ -33,6 +33,7 @@ class GateClassificationTests(unittest.TestCase):
         self.assertTrue(gate.is_protected("main.py"))
         self.assertTrue(gate.is_protected("tools/new_detector.py"))
         self.assertTrue(gate.is_protected("src/new_detector.py"))
+        self.assertTrue(gate.is_protected("governance/evil.py"))
         self.assertTrue(gate.is_protected("contracts/candidate_event.schema.json"))
 
     def test_documentation_and_explicit_draft_are_not_protected(self):

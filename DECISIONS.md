@@ -231,3 +231,53 @@ Preserved limitations include:
 Next project action:
 prepare a separate M2-01 Video Timestamp Integrity execution proposal for HUMAN decision.
 Do not execute M2 without separate authorization.
+
+
+## D-026 — HUMAN authorizes M2-01 Video Timestamp Integrity
+
+decision_id:
+HUMAN-M2-01-AUTH-001
+
+source:
+HUMAN_EXPLICIT_AUTHORIZE_M2_01
+
+proposal_revision:
+3
+
+authorized_subject_version:
+2b2926d8e0c91997913a30ff889725e0abdf54b7
+
+proposal_artifact:
+M2_01_EXECUTION_PROPOSAL.md
+
+authorization_scope:
+Execute exactly M2-01 revision 3 on one supplied native DJI Air 3S MP4.
+
+Permitted:
+- input SHA-256 and identity recording,
+- ffprobe stream discovery,
+- two decoded-frame enumerations,
+- enumeration-order timestamp anomaly analysis,
+- deterministic 10/30/50/70/90% sample selection,
+- two exact ordinal-based extraction runs for five frames,
+- source RGB24 raw-pixel hashing,
+- saved PNG decode-to-RGB24 hashing and dimension comparison,
+- PNG byte hashing,
+- command stderr/exit-status capture,
+- compact evidence package and PASS / FAIL / INCONCLUSIVE result.
+
+Explicitly not authorized:
+- M2-02 or later experiments,
+- dependency installation,
+- model execution/training,
+- repository implementation/adapters/orchestrator,
+- merge to main,
+- architecture freeze,
+- flight/route execution,
+- publish/release/deploy.
+
+Input:
+Air3s_normal.MP4 supplied by HUMAN in current conversation.
+
+Next action:
+execute only M2-01 and return result for independent review.

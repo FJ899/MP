@@ -2,5 +2,8 @@
 # GitHub rules are configured to require Code Owner approval.
 /governance/ @FJ899
 /.github/workflows/ @FJ899
+/.github/CODEOWNERS @FJ899
 /AGENTS.md @FJ899
 /research/records/ @FJ899
+/scripts/check_research_gate.py @FJ899
+/tests/test_research_gate.py @FJ899

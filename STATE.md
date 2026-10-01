@@ -2,230 +2,193 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 7
+state_version: 8
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT
-changed_fields: human_artifact_acceptance, accepted_decisions, research_gate_status, state_version, next_action
+changed_fields: M1_reconnaissance_result, M1_review_candidate, M2_smoke_proposal, source_pins, next_action
 
 ## Approved goal
+
 Sprawdzić, czy z istniejących narzędzi można złożyć minimalne laboratorium, które przyjmuje materiał z lotu inspekcyjnego, analizuje go kilkoma komplementarnymi metodami, łączy wyniki i przekazuje operatorowi ograniczoną listę miejsc CONFIRM / REJECT / RECHECK.
 
-Hipoteza:
-> Czy MP wyławia z 30 minut filmu miejsca, którym człowiek rzeczywiście powinien przyjrzeć się ponownie?
+Hypothesis:
+Czy MP wyławia z 30 minut filmu miejsca, którym człowiek rzeczywiście powinien przyjrzeć się ponownie?
 
-## Approved scope
-CURRENT BUILD SCOPE:
+## Current scope
+
+CURRENT:
 - post-flight video analysis
-- FFmpeg/OpenCV preprocessing
+- video/frame provenance
+- quality-gate research
 - anomaly detection
-- known-defect detection
-- sliced inference
+- known-defect detection research
+- sliced inference research
 - segmentation/tracking
-- optional VLM interpretation
 - merger/deduplication
-- candidate events
-- operator review
+- CandidateEvent evidence
+- operator CONFIRM / REJECT / RECHECK
 
-RESEARCH SCOPE MAY ALSO INSPECT:
-- quality-gate implementations
-- telemetry parsers
-- route-generation / DJI WPML/KMZ tools
-- re-inspection/recollection systems
-- whole-system UAV inspection implementations
-- datasets/benchmarks relevant to defect detection
-
-Research inclusion does not promote an item into CURRENT BUILD SCOPE.
-
-## Non-goals now
-- Air 3S control implementation
-- autonomous return/waypoints implementation
-- OMVS product architecture
-- dual-use architecture
+RESEARCH-ONLY / LATER:
+- Air 3S telemetry integration
+- route/WPML/KMZ automation
+- autonomous reinspection
+- COLMAP/full 3D
 - edge deployment
-- multisensor/thermal
-- custom autopilot
-- full 3D reconstruction
-- production GUI
+- thermal/multisensor
+- production GUI/productization
 
-## Working method — SEARCH BEFORE BUILD
-For every major component before design/implementation:
+## Working method
 
-1. PROBLEM — define the exact unresolved function.
-2. VERTICAL SEARCH — find systems solving nearly the same end-to-end problem.
-3. HORIZONTAL SEARCH — find implementations solving the exact component.
-4. INSPECT / RUN — inspect source first; execute the cheapest discriminating test where justified.
-5. COMPARE — compare candidates against MP requirements.
-6. CLASSIFY — assign integration_role and decision.
-7. BUILD — only when existing solutions are insufficient or adaptation costs more than a minimal custom implementation.
+For every major component:
 
-BUILD is the last option, not the default.
+PROBLEM
+→ VERTICAL SEARCH + HORIZONTAL SEARCH
+→ INSPECT / RUN where justified
+→ COMPARE
+→ USE / ADAPT / LEARN / REJECT / PARK
+→ BUILD only when existing solutions are insufficient.
 
-### Integration roles
-- DEPENDENCY
-- COMPONENT
-- REFERENCE_IMPLEMENTATION
-- BENCHMARK
-- REJECTED
+Research Gate technical repair:
+HUMAN-ACCEPTED in reviewed scope.
 
-### Decision/status vocabulary
-- EVALUATE
-- USE
-- ADAPT
-- LEARN
-- REJECT
-- PARK
-
-Each radar entry must include REPLACES WHAT? and WHY.
-
-## Current milestone
-M1 — TECHNOLOGY RECONNAISSANCE + REPOSITORY SUITABILITY AUDIT
-
-M1 has one milestone and two ordered phases:
-- M1A: Technology Reconnaissance around the current MP problem map.
-- M1B: Suitability audit of the strongest candidates.
-
-MP Architecture v0.1 is NOT READY TO FREEZE until M1 completes.
-
-## M1 DONE
-1. Exact source identity or UNRESOLVED.
-2. Verified INPUT -> FUNCTION -> OUTPUT.
-3. Repo license separated from model/weights license where relevant.
-4. CPU/GPU requirements recorded from sources.
-5. Training/reference/prompt/downstream dependencies identified.
-6. Adapter need classified.
-7. Each KEEP/USE/ADAPT linked to the RECHECK hypothesis.
-8. No speculative component retained only for future value.
-9. COLMAP/telemetry remain non-blocking to first vision-value proof.
-10. Concrete M2 smoke-test candidate list produced.
-11. Each major problem area has recorded VERTICAL and/or HORIZONTAL searches, including query/date/no-result where applicable.
-12. Radar candidates record NAME, URL, PROBLEM SOLVED, INPUT, OUTPUT, LICENSE, LAST ACTIVE, TESTS, DOCUMENTATION, GPU/CPU, MATURITY, INTEGRATION COST, WHAT WE CAN LEARN, REPLACES WHAT?, ROLE, DECISION and WHY.
-13. Rejected candidates keep a durable WHY/evidence record.
-14. A custom BUILD proposal must identify which existing candidates were inspected and why USE/ADAPT/LEARN did not satisfy the requirement.
-15. MP Architecture v0.1 is not frozen before the reconnaissance pass is reviewed.
-
-## Authorization
-audit_read: authorized
-technology_reconnaissance: authorized
-branch_changes_for_review: authorized by current task
-merge_to_main: NOT AUTHORIZED
-build_orchestrator: NOT AUTHORIZED
-publish/release/deploy: NOT AUTHORIZED
-
-## Governance enforcement
-Research Gate is now represented by:
-- AGENTS.md
-- governance/BUILD_POLICY.md
-- research/records/*.json
-- governance/build_requests/*.json
-- scripts/check_research_gate.py
-- .github/workflows/research-gate.yml
-- .github/PULL_REQUEST_TEMPLATE.md
-- .github/CODEOWNERS
-
-The automated gate is intended to block protected implementation-like changes without accepted research/build records.
-
-Repository ruleset status observed on 2026-10-01:
-- repository rulesets: none configured
-- connector cannot write branch-protection/ruleset settings
-
-Therefore hard merge enforcement on main is PENDING OWNER CONFIGURATION after review.
-
-## Research Gate repair status
-
-AI-B review MP/review-001/AI-B:
-REQUEST_CHANGES.
-
-AI-B review MP/review-002/AI-B:
-REQUEST_CHANGES limited to MP-R01 classification precedence/draft exemption.
-
-repair_review_cycle:
-2 of maximum 2.
-
-Current finding status:
-- MP-R01 manifest/draft classification: REPAIRED / PENDING_FINAL_REVIEW
-- MP-R02 stale/broad authorization reuse: RESOLVED_BY_REVIEW
-- MP-R03 CODEOWNERS gaps: RESOLVED_BY_REVIEW
-- MP-R04 weak record validation: RESOLVED_BY_REVIEW
-
-MP-R01 second repair:
-- dependency/runtime manifest recognition now precedes generic documentation/data exemptions,
-- contract draft exemption is restricted to JSON/YAML/YML/Markdown design artifacts,
-- executable *.draft.py remains protected,
-- regression tests include the four AI-B counterexamples plus a Git test for experiments/requirements.txt without Build Request.
-
-M1 status:
-OPEN.
-Technology Reconnaissance remains incomplete and is not closed by this governance repair.
-
-MP Architecture v0.1:
-NOT READY TO FREEZE.
-
-GitHub enforcement:
-- repository rulesets observed: []
-- classic branch protection: UNAVAILABLE through connector (403)
-- hard merge enforcement remains owner-configuration work after review.
-
-## Next action
-Final AI-B repair review for MP-R01.
-
-If another blocking/major Research Gate defect remains after this second repair-review cycle, do not enter a third automatic repair loop. Escalate a BLOCKER_DECISION to HUMAN under TWO-WEBAI limits.
-
-M1 Technology Reconnaissance remains a separate OPEN activity.
-
-
-## Human Artifact Decision — Research Gate
+accepted_research_gate_version:
+f799d26184504ae890b3a8ab064ad29de9267cbd
 
 decision_id:
 HUMAN-ARTIFACT-DECISION-RG-001
 
-source:
-HUMAN_EXPLICIT_ACCEPT
+Known Research Gate limitations remain:
+- GitHub Actions PASS for accepted artifact was not observed,
+- hard merge enforcement is not verified,
+- classic branch protection is unavailable through connector.
 
-accepted_subject_version:
-f799d26184504ae890b3a8ab064ad29de9267cbd
+## Current milestone
 
-artifact_decision:
-ACCEPT
+M1 — TECHNOLOGY RECONNAISSANCE + REPOSITORY SUITABILITY AUDIT
 
-acceptance_scope:
-Techniczna naprawa Research Gate MP-R01–MP-R04.
+m1_status:
+READY_FOR_INDEPENDENT_REVIEW
 
-accepted_review:
-MP/review-003/AI-B
+m1_human_acceptance:
+PENDING
 
-accepted_review_verdict:
-PASS
+m1_result:
+M1_RESULT.md
 
-research_gate_repair_status:
-TECHNICALLY_ACCEPTED_IN_REVIEWED_SCOPE
-
-explicit_non_authorizations:
-- merge_to_main remains NOT AUTHORIZED
-- build_orchestrator remains NOT AUTHORIZED
-- product implementation remains NOT AUTHORIZED
-- publish remains NOT AUTHORIZED
-- release remains NOT AUTHORIZED
-- deploy remains NOT AUTHORIZED
-- M1 closure remains NOT AUTHORIZED
-- MP Architecture v0.1 freeze remains NOT AUTHORIZED
-
-known_limitations_preserved:
-- GitHub Actions run for accepted candidate: NOT_OBSERVED
-- hard merge enforcement: NOT_VERIFIED
-- classic branch protection: UNAVAILABLE through connector
-- authenticity of recorded human authorization fields still depends on process/review, not cryptographic proof
-- NARROW_REPAIR classification remains a review judgment
-- Research Gate does not prove code conforms semantically to an accepted solution
-
-M1 status:
-OPEN
+m2_proposal:
+M2_SMOKE_TEST_PLAN.md
 
 MP Architecture v0.1:
 NOT READY TO FREEZE
 
-## Next action after acceptance
-Resume M1 Technology Reconnaissance.
+## M1 DONE contract
 
-Priority:
-complete the still-open VERTICAL/HORIZONTAL searches and source audits needed to decide which existing solutions should be USE / ADAPT / LEARN / REJECT / PARK before MP Architecture v0.1 can be frozen.
+1. Exact source identity or UNRESOLVED.
+2. Verified INPUT -> FUNCTION -> OUTPUT.
+3. Repo license separated from model/weights/data license where relevant.
+4. CPU/GPU requirements recorded from sources.
+5. Training/reference/prompt/downstream dependencies identified.
+6. Adapter need classified.
+7. Each serious EVALUATE/USE/ADAPT tied to RECHECK hypothesis.
+8. No speculative component retained only for future value.
+9. COLMAP/telemetry remain non-blocking.
+10. Concrete M2 smoke-test candidate list produced.
+11. Major problem areas have recorded Vertical/Horizontal searches including NO_RESULT where applicable.
+12. Serious Radar candidates record required decision fields.
+13. Rejected candidates retain WHY/evidence; no false REJECT is required when PARK is correct.
+14. Any custom BUILD proposal must prove existing solutions insufficient.
+15. Architecture is not frozen before independent review + HUMAN decision.
+
+Coverage claim:
+see M1_RESULT.md.
+It remains a claim for AI-B to verify, not self-acceptance.
+
+## Proposed M2 candidate set
+
+EVALUATE after future authorization:
+- FFmpeg
+- OpenCV
+- BRISQUE
+- Anomalib PatchCore
+- SAM2.1 Hiera Small
+- Weighted Boxes Fusion
+- Norfair
+
+BLOCKED:
+known-defect detector until task-relevant checkpoint/license or separately authorized training path exists.
+
+PARK:
+- VLM
+- CVAT
+- telemetry
+- route generation
+- COLMAP/3D
+- extra tracker/VOS alternatives unless a smoke test exposes a gap.
+
+## Authorization
+
+audit_read:
+AUTHORIZED
+
+technology_reconnaissance:
+AUTHORIZED
+
+repository_suitability_audit:
+AUTHORIZED
+
+prepare_M1_for_review:
+AUTHORIZED
+
+M1 acceptance:
+PENDING HUMAN
+
+M2 execution:
+NOT AUTHORIZED
+
+dependency installation:
+NOT AUTHORIZED by this state
+
+implementation:
+NOT AUTHORIZED
+
+merge_to_main:
+NOT AUTHORIZED
+
+architecture_freeze:
+NOT AUTHORIZED
+
+publish/release/deploy:
+NOT AUTHORIZED
+
+flight/route execution:
+NOT AUTHORIZED
+
+## Execution status
+
+MP execution of proposed M2 components:
+NOT_RUN
+
+End-to-end MP pipeline:
+NOT_BUILT / NOT_RUN
+
+No source README claim is promoted to MP runtime evidence.
+
+## Material open gaps
+
+- exact licensed task-relevant known-defect checkpoint unresolved;
+- PatchCore pretrained backbone identity/terms must be pinned before execution;
+- no MP hardware benchmarks;
+- no actual Air 3S video/log compatibility execution in M1;
+- no accepted quality thresholds;
+- CandidateEvent semantic merger remains an open integration hypothesis;
+- some reference repos have unresolved/no top-level license.
+
+## Next action
+
+AI-B performs independent M1 review of the pinned candidate artifacts.
+
+After AI-B review:
+HUMAN decides whether to ACCEPT / REQUEST_CHANGES / DEFER the M1 result and whether any M2 smoke execution should be authorized.
+
+No architecture freeze or implementation occurs before that decision.

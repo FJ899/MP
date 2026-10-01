@@ -92,6 +92,33 @@ class GateClassificationTests(unittest.TestCase):
             self.assertIn("non-empty query", joined)
             self.assertIn("integration_role", joined)
 
+    def test_invalid_calendar_date_and_search_status_consistency(self):
+        errors = []
+        gate.validate_search(
+            {
+                "date": "2026-02-30",
+                "status": "DONE",
+                "queries": ["quality gate"],
+                "candidates": [],
+            },
+            "bad_done",
+            errors,
+        )
+        gate.validate_search(
+            {
+                "date": "2026-10-01",
+                "status": "NO_RESULT",
+                "queries": ["quality gate"],
+                "candidates": ["unexpected/repo"],
+            },
+            "bad_no_result",
+            errors,
+        )
+        joined = "\n".join(errors)
+        self.assertIn("real ISO date", joined)
+        self.assertIn("DONE requires at least one candidate", joined)
+        self.assertIn("NO_RESULT requires candidates=[]", joined)
+
 
 class GateEndToEndTests(unittest.TestCase):
     def setUp(self):

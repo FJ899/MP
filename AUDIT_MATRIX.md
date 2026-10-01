@@ -12,7 +12,7 @@ No runtime row is PASS.
 | Problem area | Strongest candidate/reference | Input | Output | Source requirements / compute | Repo/model license state | Adapter | M1 disposition | RECHECK relevance | Critical limitation |
 |---|---|---|---|---|---|---|---|---|---|
 | Video ingestion | FFmpeg + OpenCV | native video | frames + timestamps + arrays | CPU baseline; HW decode optional | FFmpeg default LGPL-2.1+ config-sensitive; OpenCV Apache-2.0 | THIN | EVALUATE M2 | preserves exact source interval/frame evidence | Air 3S timestamp behavior NOT_TESTED |
-| Quality signal | rehanguha/brisque | image | BRISQUE score | CPU; NumPy/SciPy/scikit-image/libsvm/OpenCV | Apache-2.0 | THIN | EVALUATE M2 | can reject obviously poor evidence before analysis | not a complete quality gate or threshold |
+| Quality signal | rehanguha/brisque | image | BRISQUE score | CPU; NumPy/SciPy/scikit-image/libsvm/OpenCV + bundled SVM/normalization artifacts | code Apache-2.0; default svm.txt/normalize.pickle provenance+terms UNRESOLVED | THIN | EVALUATE M2 WITH PRECONDITION | can reject obviously poor evidence before analysis | not a complete gate; default model artifacts cannot be treated as cleared until terms/provenance resolved |
 | Quality architecture | IIQC | UAV inspection image + pose/bridge context | quality/recollection feedback | ROS/pose/3D/PCL/OctoMap context | project license UNRESOLVED | HIGH direct / NONE reference | LEARN | shows quality failure→recollection pattern | too heavy/unclear license for direct first component |
 | Anomaly | Anomalib PatchCore | normal references + test image | anomaly score/map | Python>=3.10; CPU/GPU extras; pretrained backbone | Apache-2.0 code; backbone/model license separate | THIN-MODERATE | EVALUATE M2 | can surface unknown irregularities for RECHECK | needs representative normality; quality artifacts may dominate |
 | VLM authority reference | AI-Visual-Inspector | detector verdict/heatmap + image | descriptive explanation | Anomalib + Ollama/Qwen; hardware model-dependent | no LICENSE found | REFERENCE | LEARN / PARK runtime | useful human explanation without VLM overriding detector | source project license unresolved; no need in first smoke |
@@ -89,3 +89,15 @@ PIPELINE_COMPATIBILITY_NOT_TESTED:
 all proposed M2 candidates.
 
 No statement in this matrix means MP currently works end-to-end.
+
+
+### F-009 — BRISQUE has separate default model artifacts
+At pinned commit 42c854ef9278f09d047abb8600d5204f779eca52, BRISQUE.__init__() loads:
+- brisque/models/svm.txt via libsvm svm_load_model,
+- brisque/models/normalize.pickle via pickle.load.
+
+The root code license is Apache-2.0.
+The provenance and independent terms of the bundled model/normalization artifacts are not established by M1.
+
+Consequence:
+M2-02 is conditional on resolving those artifacts or supplying a custom BRISQUE model with pinned acceptable provenance/terms.

@@ -179,3 +179,55 @@ Next decision sequence:
 AI-B independent review
 → HUMAN M1 artifact decision
 → only then any separately scoped M2 execution authorization.
+
+
+## D-025 — HUMAN accepts M1 Technology Reconnaissance + Repository Suitability Audit
+
+decision_id:
+HUMAN-ARTIFACT-DECISION-M1-001
+
+source:
+HUMAN_EXPLICIT_ACCEPT
+
+accepted_subject_version:
+c701a8e87ae1f4e067dcabbfd3902bc35b43de19
+
+accepted_review:
+MP/m1-repair-review-001/AI-B
+
+review_verdict:
+PASS
+
+artifact_decision:
+ACCEPT
+
+acceptance_scope:
+- first targeted Technology Reconnaissance,
+- Repository Suitability Audit,
+- current EVALUATE / LEARN / PARK candidate classification,
+- explicitly recorded unresolved dependencies and limitations,
+- M2_SMOKE_TEST_PLAN.md as a proposal/backlog for later human authorization.
+
+This acceptance does NOT authorize:
+- M2 execution,
+- dependency installation,
+- training,
+- implementation or adapter creation,
+- BUILD orchestrator,
+- merge to main,
+- MP Architecture v0.1 freeze,
+- flight/route execution,
+- publish/release/deploy.
+
+Preserved limitations include:
+- BRISQUE default model provenance/terms UNRESOLVED,
+- PatchCore exact backbone identity/terms PRECONDITION,
+- known-defect checkpoint/license BLOCKED,
+- Air 3S compatibility NOT_TESTED,
+- quality thresholds NOT_ACCEPTED,
+- CandidateEvent semantics OPEN HYPOTHESIS,
+- previously recorded Research Gate GitHub-enforcement limitations.
+
+Next project action:
+prepare a separate M2-01 Video Timestamp Integrity execution proposal for HUMAN decision.
+Do not execute M2 without separate authorization.

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CandidateEventDraft",
+  "description": "NON-FROZEN draft for M2 discussion. M1 must determine whether this represents raw analyzer observation or merged event.",
+  "type": "object",
+  "required": [
+    "source",
+    "timestamp_start",
+    "timestamp_end",
+    "detector",
+    "type",
+    "score"
+  ],
+  "properties": {
+    "source": {"type": "string"},
+    "timestamp_start": {"type": "number", "minimum": 0},
+    "timestamp_end": {"type": "number", "minimum": 0},
+    "detector": {"type": "string"},
+    "type": {"type": "string"},
+    "score": {"type": "number"},
+    "region": {"type": "object"},
+    "evidence": {"type": "object"}
+  },
+  "additionalProperties": true
+}

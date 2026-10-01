@@ -106,3 +106,21 @@ Gate changes must preserve tests for:
 - real ISO dates,
 - non-empty queries,
 - valid integration_role.
+
+
+## D-021 — Functional manifests outrank directory exemptions
+Correction after AI-B review MP/review-002:
+Dependency/runtime manifests are classified before generic documentation/data-directory exemptions.
+
+Therefore requirements.txt, package.json, docker-compose.yml, environment.yml and equivalent manifests remain protected regardless of placement under docs/, experiments/, governance/, research/ or another data-oriented directory.
+
+## D-022 — Draft contract exemption is format-limited
+Only explicit contract design/data drafts in JSON/YAML/YML/Markdown are exempt from implementation gating.
+
+A filename containing ".draft." does not exempt executable code.
+Example:
+contracts/adapter.draft.py remains protected.
+
+## D-023 — Second repair-review cycle is final automatic loop
+This is repair-review cycle 2 of the protocol maximum 2.
+If AI-B still identifies a blocking/major Research Gate defect after this candidate, AI-A must escalate to HUMAN instead of silently starting a third repair cycle.

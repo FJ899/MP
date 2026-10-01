@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 14
+state_version: 15
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_01_human_authorization, M2_01_input_available, execution_status, state_version, next_action
+changed_fields: M2_01_execution_result, M2_01_evidence, execution_incidents, review_status, state_version, next_action
 
 ## Approved goal
 
@@ -72,7 +72,7 @@ MP Architecture v0.1:
 NOT READY TO FREEZE / NOT AUTHORIZED TO FREEZE
 
 M2_01:
-AUTHORIZED / INPUT_AVAILABLE / EXECUTION_PENDING
+EXECUTED / RESULT_PASS / PENDING_INDEPENDENT_REVIEW
 
 M2_execution:
 NOT AUTHORIZED
@@ -224,12 +224,115 @@ Explicitly not authorized:
 - flight/route execution,
 - publish/release/deploy.
 
+## M2-01 execution result
+
+experiment_id:
+M2-01-20261001-AIR3S-NORMAL-001
+
+proposal_revision:
+3
+
+execution_result:
+PASS
+
+review_status:
+PENDING_INDEPENDENT_REVIEW
+
+input:
+Air3s_normal.MP4
+
+input_size_bytes:
+74451639
+
+input_sha256:
+cc8ace8fc18280d09318d29f5b7dbcc1b7b44d986c2d83035d4421e0d927bcaa
+
+tested_stream:
+global stream index 0 — HEVC 3840x2160, 30000/1001 fps, time_base 1/30000
+
+observed_duration:
+11.244567 s
+
+frame_count:
+337
+
+timestamp_basis:
+RAW_PTS
+
+timestamp_integrity_run1:
+MISSING=0 / DUPLICATE=0 / REGRESSION=0 / FORWARD=336
+
+timestamp_integrity_run2:
+MISSING=0 / DUPLICATE=0 / REGRESSION=0 / FORWARD=336
+
+selected_ordinals:
+34 / 101 / 168 / 235 / 302
+
+formal_probe_runs_identity_equal:
+YES
+
+formal_command_nonzero_status:
+NONE
+
+for all five samples:
+- showinfo PTS/time matched selected frame,
+- source RGB24 Run A == source RGB24 Run B,
+- saved PNG decoded RGB24 == corresponding source RGB24,
+- dimensions matched 3840x2160,
+- PNG byte SHA-256 Run A == Run B.
+
+result_interpretation:
+For this supplied Air 3S sample and tested runtime, MP can reproducibly bind source SHA-256 -> stream -> decoded-frame ordinal -> raw PTS/timebase -> extracted frame -> RGB24 pixels -> saved PNG evidence.
+
+limitations:
+- supplied clip is 11.244567 s, shorter than proposed target 30–60 s,
+- embedded identifiers strongly support Air 3S identity but no independent chain-of-custody proves an untouched camera original,
+- one file/recording profile does not establish all Air 3S modes,
+- no telemetry, quality model, detector or other AI component was tested.
+
+execution_incidents:
+1. transient PIPESTATUS wrapper defect before clean formal run;
+2. transient stdin/sample-list wrapper defect before clean formal restart;
+3. container harness timeout after completed formal Run A and Run B p10; remaining independent Run B samples continued.
+
+incident_boundary:
+No incident is treated as media/timestamp failure. PASS is based only on the clean formal evidence set and all-zero formal command statuses.
+
+repository_evidence:
+- evidence/m2-01/M2-01-20261001-AIR3S-NORMAL-001/RESULT.md
+- evidence/m2-01/M2-01-20261001-AIR3S-NORMAL-001/selected_samples.csv
+- evidence/m2-01/M2-01-20261001-AIR3S-NORMAL-001/statuses_formal.txt
+- evidence/m2-01/M2-01-20261001-AIR3S-NORMAL-001/HASH_EVIDENCE.md
+- evidence/m2-01/M2-01-20261001-AIR3S-NORMAL-001/INCIDENTS.md
+
+## Authorization after M2-01
+
+M2-01:
+EXECUTED UNDER HUMAN-M2-01-AUTH-001
+
+M2-02:
+NOT AUTHORIZED
+
+dependency installation:
+NOT AUTHORIZED
+
+implementation:
+NOT AUTHORIZED
+
+merge_to_main:
+NOT AUTHORIZED
+
+architecture_freeze:
+NOT AUTHORIZED
+
+publish/release/deploy:
+NOT AUTHORIZED
+
+flight/route execution:
+NOT AUTHORIZED
+
 ## Next action
 
-Execute exactly M2-01 revision 3 on the supplied native Air3s_normal.MP4.
+AI-B independently reviews M2-01 execution evidence.
 
-After execution:
-- record PASS / FAIL / INCONCLUSIVE,
-- preserve compact evidence,
-- submit result for independent review,
-- do not continue to M2-02 automatically.
+Do not begin M2-02 or modify architecture before review and subsequent HUMAN decision.

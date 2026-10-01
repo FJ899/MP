@@ -74,3 +74,35 @@ no repository ruleset configured.
 
 Connector limitation:
 current GitHub integration exposes ruleset reads but not ruleset/branch-protection writes.
+
+
+## D-017 — Build Requests are per-change, not reusable blanket permissions
+Correction after AI-B review:
+Every protected implementation diff requires a Build Request added or modified in that same diff. Authorization uses an exact file list; wildcard scopes such as src/** are rejected.
+
+Purpose:
+prevent an accepted historical request from silently authorizing a future model family or subsystem.
+
+## D-018 — Narrow repair reuses research, not stale change authorization
+A NARROW_REPAIR may reuse the accepted Research Record for its component and does not require repeating Vertical/Horizontal search.
+
+It still requires a current per-change Build Request that records:
+- repair_of,
+- exact authorized_files,
+- component_id,
+- pinned Research Record SHA-256,
+- real human authorization provenance.
+
+## D-019 — Unknown implementation locations fail closed
+Executable/code files outside canonical component paths are protected by default.
+Moving code to main.py, tools/, governance/ or another unrecognized location is not a bypass.
+
+## D-020 — Research Gate validation is regression-tested
+Gate changes must preserve tests for:
+- unknown path blocking,
+- stale request blocking,
+- narrow repair reuse,
+- glob rejection,
+- real ISO dates,
+- non-empty queries,
+- valid integration_role.

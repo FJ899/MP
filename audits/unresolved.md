@@ -26,9 +26,14 @@ critical need:
 pin exact model variant and model license before execution.
 
 ## DJI telemetry
-status: SOURCE_IDENTITY_UNRESOLVED
+status: CANDIDATE_SET_FOUND / AIR3S_COMPATIBILITY_UNRESOLVED
+candidates inspected or identified:
+- FergusInLondon/dji_parse
+- jetervaz/dji-telemetry
+- AiryAir/dji-srt2csv
+- aero-oli/DatCon
 critical need:
-identify actual Air 3S-compatible log source/parser and available fields.
+inspect an actual Air 3S recording/log from the intended workflow and determine whether SRT/subtitle or other telemetry exposes the fields MP needs. Do not infer Air 3S compatibility from support for other DJI models.
 
 ## COLMAP
 repository: colmap/colmap

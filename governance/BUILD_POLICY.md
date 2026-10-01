@@ -2,7 +2,7 @@
 
 Status: NORMATIVE PROJECT GOVERNANCE
 Project: MP
-Policy version: 1
+Policy version: 2
 
 ## 1. Core rule
 
@@ -28,47 +28,44 @@ BUILD only if justified
 
 BUILD is the last option, not the default.
 
-## 2. What counts as a major component
+## 2. Major change vs narrow repair
 
-Research Gate is mandatory when a change introduces or materially changes any of the following:
-
+Research Gate is mandatory when a change introduces or materially changes:
 - a subsystem or pipeline stage,
 - an external dependency or model family,
 - an adapter to an external tool,
 - a data/event contract,
-- a new detector/segmenter/tracker/VLM role,
+- a detector/segmenter/tracker/VLM role,
 - quality-gate logic,
 - telemetry integration,
 - route/mission generation,
 - merger/deduplication/event clustering,
 - persistent storage/provenance architecture,
-- a new runtime/service boundary,
-- a replacement of an existing component.
+- a runtime/service boundary,
+- replacement of an existing component.
 
-Routine documentation edits and narrow bug fixes inside an already accepted component do not require a fresh search unless they reopen an architectural choice.
+A NARROW_REPAIR fixes behavior inside an already accepted component without reopening:
+- component choice,
+- model/dependency family,
+- public contract,
+- service boundary,
+- architectural role.
 
-If classification is uncertain, treat the change as major until reviewed.
+NARROW_REPAIR does not require a fresh Vertical/Horizontal search. It may reuse the accepted Research Record for that component.
 
-## 3. Research Gate requirements
+If classification is uncertain, treat the change as MAJOR until reviewed.
 
-A major component must have a durable JSON record under:
+## 3. Research Record
+
+A major component has a durable record:
 
 `research/records/<component-id>.json`
 
-The record must contain:
-
+It records:
 - component_id
 - problem
 - vertical_search
-  - date
-  - status: DONE or NO_RESULT
-  - queries
-  - candidates
 - horizontal_search
-  - date
-  - status: DONE or NO_RESULT
-  - queries
-  - candidates
 - inspected_candidates
 - comparison_summary
 - integration_role
@@ -77,140 +74,205 @@ The record must contain:
 - why
 - review_status
 - human_decision
+- human_acceptance
 
-Allowed integration_role values:
-
+Allowed integration_role:
 - DEPENDENCY
 - COMPONENT
 - REFERENCE_IMPLEMENTATION
 - BENCHMARK
 - REJECTED
 
-Allowed decision values:
-
+Allowed implementation-authorizing decision:
 - USE
 - ADAPT
 - BUILD
-- LEARN
-- REJECT
-- PARK
 
-Only USE, ADAPT or BUILD may authorize implementation work.
+LEARN / REJECT / PARK remain valid research outcomes in the Radar, but they do not authorize implementation.
 
-If decision=BUILD, `build_justification` is mandatory and must explain why inspected USE/ADAPT candidates were insufficient.
+If decision=BUILD, `build_justification` must explain why inspected USE/ADAPT candidates were insufficient.
 
-## 4. Build authorization record
+Search evidence must contain:
+- a real ISO date,
+- at least one non-empty query,
+- DONE + candidates, or
+- NO_RESULT + empty candidates.
 
-Protected implementation changes must also have a durable record under:
+A syntactically valid JSON file is not evidence that a search happened.
+
+## 4. Per-change Build Request
+
+Every protected implementation diff requires a Build Request that is ADDED OR MODIFIED IN THAT SAME DIFF:
 
 `governance/build_requests/<change-id>.json`
 
-It links implementation scope to the accepted research record.
+This is intentionally separate from the Research Record.
 
-Required fields:
+Research Record answers:
+> What solution/component choice is accepted?
 
+Build Request answers:
+> What exact repository change is authorized now?
+
+Required:
 - change_id
+- change_kind: MAJOR or NARROW_REPAIR
+- component_id
 - description
-- scope
+- authorized_files
 - research_record
+- research_record_sha256
 - authorized_decision
+- authorization
 - review_status
 - human_decision
 
-The `scope` field contains repository globs, for example:
+`authorized_files` is an exact list of repository paths.
+Wildcards/globs are forbidden.
+
+Example:
 
 ```json
-["components/quality_gate/**", "adapters/iiqc/**"]
+[
+  "components/quality_gate/adapter.py",
+  "tests/test_quality_gate.py"
+]
 ```
 
-A build request is valid only when:
+This prevents an old broad permission such as `src/**` from silently authorizing a future model family or subsystem.
 
-- referenced research record exists,
-- vertical search is DONE or NO_RESULT with recorded queries,
-- horizontal search is DONE or NO_RESULT with recorded queries,
-- decision is USE, ADAPT or BUILD,
-- build request decision matches research decision,
-- review_status=PASS,
-- human_decision=ACCEPTED.
+The Build Request must:
+- reference a non-template Research Record,
+- pin the exact Research Record contents with SHA-256,
+- use the same component_id and decision,
+- include versioned authorization provenance.
 
-## 5. Protected build paths
+Authorization provenance contains:
+- decision_id
+- source
+- state_version
+- subject_version
 
-The automated gate treats implementation-like changes as protected, including:
+For NARROW_REPAIR:
+- `repair_of` is mandatory,
+- the accepted Research Record may be reused,
+- an existing human authorization may be reused only when its recorded scope genuinely covers repair work in that component; otherwise a new human decision is required.
 
-- src/**
-- app/**
-- pipeline/**
-- components/**
-- adapters/** except README-only changes
-- models/**
-- non-draft contracts/**
-- dependency manifests such as pyproject.toml, requirements*.txt, package*.json, lockfiles
-- Docker/runtime configuration
+The AI must never invent ACCEPTED status or provenance.
 
-The exact executable check lives in:
+## 5. Fail-closed implementation detection
+
+The automated gate uses two layers:
+
+1. explicit protected locations such as:
+   - src/**
+   - app/**
+   - pipeline/**
+   - components/**
+   - models/**
+   - adapters/**
+   - non-draft contracts/**
+   - dependency/runtime manifests
+
+2. fail-closed unknown locations:
+   executable/code files such as Python, JS/TS, Go, Rust, Java, C/C++, shell, PowerShell, notebooks, SQL and proto are protected even when placed outside the expected layout.
+
+Therefore:
+- `main.py` is protected,
+- `tools/new_detector.py` is protected,
+- moving code outside `components/` does not bypass the gate.
+
+Narrow explicit exemptions exist only for governance/research/documentation artifacts needed to operate this policy.
+
+Unknown non-document artifacts outside those exemptions are protected until classified.
+
+The executable rule lives in:
 
 `scripts/check_research_gate.py`
 
-and is run by:
-
-`.github/workflows/research-gate.yml`
-
 ## 6. Evidence rule
 
-README similarity is not execution evidence.
-
-Maintain separate states for:
-
+Keep separate:
 - SOURCE_INSPECTED
 - INSTALL_VERIFIED
 - SMOKE_TEST_PASS/FAIL
 - PIPELINE_COMPATIBILITY_VERIFIED
 
-A search may produce NO_RESULT, but the query and date must be preserved.
+README similarity is not runtime proof.
 
 ## 7. Rejections are durable
 
-REJECTED solutions remain recorded with:
-
+REJECTED solutions preserve:
 - candidate/version
 - expected replacement
 - evidence
 - why rejected
-- limitations of verdict
+- limitations
 - revisit condition
 
 PARK is not REJECT.
 
 ## 8. Architecture freeze
 
-MP Architecture v0.1 cannot be frozen while any architecture-critical component has:
-
+MP Architecture v0.1 cannot freeze while an architecture-critical component has:
 - search not performed,
 - unresolved candidate role,
-- unresolved material license issue,
-- unresolved compatibility that changes architecture,
-- no review of the reconnaissance result.
+- material license ambiguity,
+- architecture-changing compatibility unknown,
+- missing review of reconnaissance.
 
-## 9. AI instructions
+## 9. AI entry instructions
 
 Any AI working in this repository must:
-
 1. Read `AGENTS.md`.
 2. Read this policy.
 3. Read `STATE.md`.
-4. Check `research/REPO_RADAR.md` and existing `research/records/`.
-5. Refuse to proceed directly to major BUILD when Research Gate evidence is missing.
-6. Produce/update the research record first.
-7. Never self-promote a proposal into HUMAN_ACCEPTED.
+4. Check `research/REPO_RADAR.md` and relevant Research Records.
+5. Stop before MAJOR BUILD if Research Gate evidence is missing.
+6. Create/update research evidence first.
+7. Never self-promote proposal/review into HUMAN_ACCEPTED.
 
-## 10. Enforcement limitation
+## 10. Automated checks
 
-Files and CI can strongly prevent accidental bypass, but they are not cryptographic guarantees against an administrator intentionally disabling the gate.
+GitHub Actions runs:
+- regression tests for Research Gate,
+- Research Gate validation against the PR/push diff.
 
-For strongest enforcement on `main`, GitHub repository rules should require:
+The regression suite must include at least:
+- unknown root code path blocked,
+- unknown nested code path blocked,
+- stale historical Build Request cannot authorize a new protected file,
+- narrow repair can reuse accepted Research Record with a fresh per-change Build Request,
+- invalid ISO date rejected,
+- blank query rejected,
+- invalid integration_role rejected.
+
+## 11. CODEOWNERS
+
+When GitHub Code Owner review is required, owner review must cover:
+- governance/**
+- .github/workflows/**
+- .github/CODEOWNERS
+- AGENTS.md
+- research/records/**
+- scripts/check_research_gate.py
+- tests/test_research_gate.py
+
+This protects both the written policy and the executable enforcement logic.
+
+## 12. GitHub enforcement limitation
+
+Files and CI strongly prevent accidental bypass but cannot stop an administrator from intentionally disabling the protection.
+
+Strong merge enforcement on `main` should require:
 - pull requests,
 - the `Research Gate` status check,
-- human/code-owner review for governance and workflow changes,
-- no routine bypass of required checks.
+- Code Owner review for governance/enforcement changes,
+- dismissal/re-review after material changes where available,
+- no routine bypass.
 
-The repository connector currently used by MP can create the files/workflow but does not expose ruleset/branch-protection write operations. GitHub settings must therefore be configured separately by the repository owner.
+Observed repository rulesets and classic branch protection must be reported separately:
+- empty ruleset list does not prove classic branch protection is absent,
+- if classic branch protection cannot be read, status is UNAVAILABLE rather than NONE.
+
+The current connector can create/update repository files but does not expose ruleset/branch-protection writes. Owner configuration remains an external step after review.

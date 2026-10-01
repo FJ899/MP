@@ -49,3 +49,30 @@ Reviewer must not freeze MP Architecture v0.1 or choose final dependencies on be
 
 ## Explicit non-authorization
 Review PASS does not authorize merge, implementation, model training, flight execution, route upload, deployment, publication, or promotion of any candidate to dependency.
+
+
+## Research Gate enforcement review
+
+11. Is `governance/BUILD_POLICY.md` a clear normative source of truth rather than duplicating STATE ambiguously?
+12. Does `AGENTS.md` create a useful AI entry STOP rule without pretending all tools automatically enforce it?
+13. Does `scripts/check_research_gate.py` protect the right implementation-like paths?
+14. Are README-only adapter docs and explicit *.draft.* contracts correctly excluded from hard build blocking?
+15. Does the gate avoid requiring a fresh search for every narrow bug fix in an already accepted component?
+16. Are research record and build request separate for a good reason:
+    - research answers "what should we do?",
+    - build request answers "what exact repository scope is now authorized?"
+17. Is requiring review_status=PASS and human_decision=ACCEPTED appropriate before protected implementation?
+18. Can the gate be bypassed accidentally by placing code outside currently protected path patterns?
+19. Should the project adopt a future canonical implementation layout (for example components/<id>/) to make gate coverage easier?
+20. Is CODEOWNERS coverage sufficient for governance/workflow files once GitHub owner enables required Code Owner review?
+21. Current repository rulesets are empty. Confirm that CI alone is NOT hard merge enforcement until main requires the Research Gate status check.
+22. Is the enforcement design proportionate to MP, or has it become process-heavy enough to slow small experiments?
+
+### Required reviewer distinction
+Classify any finding as:
+- POLICY flaw,
+- AUTOMATION flaw,
+- GITHUB CONFIGURATION gap,
+- PROCESS OVERHEAD suggestion.
+
+Do not treat the absence of current branch protection as a code defect in the policy. It is an explicit owner-configuration gap.

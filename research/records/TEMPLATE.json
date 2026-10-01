@@ -3,22 +3,29 @@
   "component_id": "replace-me",
   "problem": "Exact unresolved function.",
   "vertical_search": {
-    "date": "YYYY-MM-DD",
+    "date": "2026-10-01",
     "status": "DONE",
     "queries": [
       "near-end-to-end system query"
     ],
-    "candidates": []
+    "candidates": [
+      "owner/repository"
+    ]
   },
   "horizontal_search": {
-    "date": "YYYY-MM-DD",
+    "date": "2026-10-01",
     "status": "DONE",
     "queries": [
       "exact component implementation query"
     ],
-    "candidates": []
+    "candidates": [
+      "owner/component-repository"
+    ]
   },
-  "inspected_candidates": [],
+  "inspected_candidates": [
+    "owner/repository",
+    "owner/component-repository"
+  ],
   "comparison_summary": "What existing solutions do and where the actual gap remains.",
   "integration_role": "COMPONENT",
   "decision": "ADAPT",
@@ -26,5 +33,11 @@
   "why": "Decision rationale grounded in evidence.",
   "build_justification": "",
   "review_status": "PENDING",
-  "human_decision": "PENDING"
+  "human_decision": "PENDING",
+  "human_acceptance": {
+    "decision_id": "PENDING",
+    "source": "PENDING",
+    "state_version": 1,
+    "subject_version": "PENDING"
+  }
 }

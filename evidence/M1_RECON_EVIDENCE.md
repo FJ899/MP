@@ -293,7 +293,7 @@ SOURCE_INSPECTED
 impact:
 MP does not need to invent the metric family from first principles.
 
-## E-M1-011 — BRISQUE small licensed quality component
+## E-M1-011 — BRISQUE code + separate default model artifacts
 
 source:
 rehanguha/brisque
@@ -309,9 +309,25 @@ setup.py
 observed:
 - no-reference image quality score;
 - image ndarray input;
-- Apache-2.0;
+- root repository LICENSE is Apache-2.0;
 - NumPy/SciPy/scikit-image/libsvm dependencies;
-- selectable OpenCV package variant.
+- selectable OpenCV package variant;
+- BRISQUE.__init__() defaults to brisque/models/svm.txt and brisque/models/normalize.pickle;
+- svm.txt is loaded through svm_load_model;
+- normalize.pickle is loaded through pickle.load;
+- custom model_path can replace both default artifacts.
+
+default_model_artifacts:
+- svm.txt git blob: 19237f04eae11398a2a41b91a7ef8ad2bfc084d5
+- normalize.pickle git blob: 18ed3adf6991d0feba7b3cb832a247209f9f5cf1
+
+history:
+both artifacts were introduced in commit 10e2dd2a23ee597e788761b161bec1c60aa046fd with message "Made a package out of the code and added the models."
+
+artifact_provenance_and_terms:
+UNRESOLVED.
+
+M1 does not establish whether Apache-2.0 covers or excludes these bundled artifacts.
 
 source_status:
 SOURCE_INSPECTED
@@ -320,7 +336,7 @@ mp_execution:
 MP_NOT_RUN
 
 impact:
-clean candidate for one small quality-signal smoke; it is not a complete quality gate.
+BRISQUE remains a candidate, but M2-02 default-model execution is blocked until artifact provenance/terms are resolved or a custom model with acceptable pinned provenance/terms is supplied.
 
 ## E-M1-012 — IIQC quality→recollection architecture
 

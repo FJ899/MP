@@ -1,165 +1,149 @@
-# Review request — revised M1 candidate
+# M1 Independent Review Request
 
-Review target: branch audit/m1-repo-suitability-v2
+review_target:
+FJ899/MP branch audit/m1-repo-suitability-v2
 
-## Change under review
-Human corrected the working method:
+review_subject:
+M1 — Technology Reconnaissance + Repository Suitability Audit
 
-PROBLEM
--> VERTICAL SEARCH + HORIZONTAL SEARCH
--> INSPECT / RUN
--> COMPARE
--> USE / ADAPT / LEARN / REJECT / PARK
--> BUILD only if a real gap remains.
+candidate_status:
+READY_FOR_INDEPENDENT_REVIEW
 
-The goal did not change.
-MP Architecture v0.1 is explicitly NOT READY TO FREEZE.
+## Review inputs
 
-## Reviewer questions
-1. Does the revised candidate preserve the approved hypothesis: 30 min video -> limited candidate events -> human RECHECK?
-2. Does the SEARCH-BEFORE-BUILD gate materially prevent premature custom implementation?
-3. Are VERTICAL and HORIZONTAL searches distinct enough to catch both whole-system competitors and component-level substitutes?
-4. Are integration roles (DEPENDENCY / COMPONENT / REFERENCE_IMPLEMENTATION / BENCHMARK / REJECTED) correctly separated from decisions (EVALUATE / USE / ADAPT / LEARN / REJECT / PARK)?
-5. Does REPO_RADAR capture enough information to influence backlog, especially REPLACES WHAT? and WHY?
-6. Are source claims separated from MP assessments and execution evidence?
-7. Is architecture freeze correctly blocked until Technology Reconnaissance is reviewed?
-8. Are any current findings overstated, especially:
-   - IIQC as a possible quality-gate source despite its heavier ROS/3D/pose context,
-   - AI-Visual-Inspector as a detector-authority/VLM-description reference,
-   - WayPoint's claimed Air 3S support without MP execution,
-   - DroneRoute's lack of Air 3S in its current supported-drone list,
-   - drone-mission-planning's explicit need for Air 3S calibration,
-   - BFD-UAV2K's pending license information?
-9. Is the current first-pass reconnaissance sufficiently broad to continue M1, while still marking incomplete searches as incomplete rather than pretending coverage?
-10. Has any research-only item (telemetry/route generation/whole-system references) leaked into CURRENT BUILD SCOPE?
+Primary:
+- STATE.md
+- M1_RESULT.md
+- M2_SMOKE_TEST_PLAN.md
+- AUDIT_MATRIX.md
+- SOURCES.md
+- research/PINNED_SOURCES.md
+- research/SEARCH_LOG.md
+- research/REPO_RADAR.md
+- research/COMPONENT_CANDIDATES.md
+- research/ARCHITECTURE_REFERENCES.md
 
-## Blocking criteria
-A finding is BLOCKING/MAJOR only if it conflicts with approved goal/DONE, source discipline, evidence discipline, search-before-build discipline, or creates material integration risk.
+Component audits:
+- audits/video-ingestion.md
+- audits/quality-gate.md
+- audits/anomalib-patchcore.md
+- audits/detector-selection.md
+- audits/sahi.md
+- audits/segmentation-tracking.md
+- audits/merger-temporal.md
+- audits/recheck-recollection.md
+- audits/hawk-i.md
+- audits/unresolved.md
 
-## Expected reviewer output
-For each BLOCKING/MAJOR:
+Governance:
+Research Gate technical repair is already HUMAN-ACCEPTED in its reviewed scope. Do not reopen that review unless the M1 changes introduce a new contradiction.
+
+## Required review questions
+
+### RQ-01 Goal alignment
+Does M1 remain centered on:
+post-flight inspection material → limited evidence-backed CONFIRM / REJECT / RECHECK candidates?
+
+### RQ-02 Search sufficiency
+Are Vertical + Horizontal searches broad enough for the current decision surface, or is a materially important class of existing solution missing?
+
+Do not demand exhaustive repository collection merely for completeness.
+
+### RQ-03 Search-to-backlog effect
+Did reconnaissance actually remove/postpone unnecessary custom work?
+
+Check specifically:
+- custom ingestion,
+- custom image-quality model,
+- custom mask tracker,
+- generic box fusion,
+- generic tracker,
+- telemetry parser,
+- KMZ generator.
+
+### RQ-04 Source identity
+Are serious source claims pinned to exact commits or explicitly UNRESOLVED?
+
+### RQ-05 Evidence discipline
+Are SOURCE_INSPECTED, reported upstream execution, and MP execution kept distinct?
+
+M1 has not run the proposed M2 components.
+
+### RQ-06 Licensing
+Are code, dataset and model/checkpoint licenses separated correctly?
+Flag any place where UNKNOWN/PENDING was silently treated as permission.
+
+Pay special attention to:
+- FFmpeg build configuration,
+- PatchCore pretrained backbone,
+- BFD-UAV2K,
+- Cutie pretrained model,
+- IIQC,
+- Hawk-I/AegisInspect/reference repos,
+- Ultralytics code vs defect weights.
+
+### RQ-07 Ingestion choice
+Is FFmpeg/OpenCV a justified minimal first smoke candidate after inspecting PySceneDetect/PyAV/VidGear?
+
+### RQ-08 Quality gate
+Is BRISQUE appropriately treated as one test signal rather than a complete gate?
+Is IIQC correctly LEARN rather than runtime dependency?
+
+### RQ-09 Anomaly
+Is PatchCore correctly scoped as anomaly ranking requiring normal-reference material, not crack detection?
+
+### RQ-10 Detector path
+Is the known-defect smoke correctly BLOCKED pending task-relevant checkpoint/license rather than faked using generic YOLO?
+
+### RQ-11 Segmentation/tracking
+Is SAM2.1 Small a reasonable cheapest first prompted-persistence smoke after inspecting Cutie/XMem/DEVA/Track-Anything?
+
+### RQ-12 Merger gap
+Does the evidence support this decomposition:
+- WBF for same-frame geometric fusion,
+- Norfair/SAM2 for temporal continuity,
+- spatial dedup later,
+- MP-specific CandidateEvent semantics still open?
+
+Challenge this if an inspected or obvious missing implementation already solves the complete problem better.
+
+### RQ-13 Recheck boundary
+Is it reasonable for first MP RECHECK to remain a human-facing source interval/frame/reason rather than autonomous revisit?
+
+### RQ-14 M2 minimality
+Can the seven proposed M2 smoke tests be reduced while still answering the central hypothesis?
+If so, identify what can be removed and why.
+
+### RQ-15 M1 DONE coverage
+Independently verify D1–D15 in M1_RESULT.md.
+Do not accept a criterion merely because AI-A marked it satisfied.
+
+### RQ-16 Architecture freeze
+Confirm that M1 review does not itself freeze MP Architecture v0.1.
+
+## Blocking / major finding contract
+
+For each BLOCKING or MAJOR:
 - issue_id
-- violated DONE/contract
+- severity
+- violated M1 DONE / source / evidence rule
+- exact artifact/location
 - evidence
-- impact
+- consequence
 - minimum correction
+- verification method
 
-Reviewer may recommend a simpler search/audit path.
-Reviewer must not freeze MP Architecture v0.1 or choose final dependencies on behalf of HUMAN.
+MINOR/NOTE findings should not silently become new M1 requirements.
 
 ## Explicit non-authorization
-Review PASS does not authorize merge, implementation, model training, flight execution, route upload, deployment, publication, or promotion of any candidate to dependency.
 
+A PASS review does NOT:
+- merge the branch,
+- run M2,
+- install dependencies,
+- train models,
+- create implementation adapters,
+- freeze MP Architecture v0.1,
+- authorize flight/route actions.
 
-## Research Gate enforcement review
-
-11. Is `governance/BUILD_POLICY.md` a clear normative source of truth rather than duplicating STATE ambiguously?
-12. Does `AGENTS.md` create a useful AI entry STOP rule without pretending all tools automatically enforce it?
-13. Does `scripts/check_research_gate.py` protect the right implementation-like paths?
-14. Are README-only adapter docs and explicit *.draft.* contracts correctly excluded from hard build blocking?
-15. Does the gate avoid requiring a fresh search for every narrow bug fix in an already accepted component?
-16. Are research record and build request separate for a good reason:
-    - research answers "what should we do?",
-    - build request answers "what exact repository scope is now authorized?"
-17. Is requiring review_status=PASS and human_decision=ACCEPTED appropriate before protected implementation?
-18. Can the gate be bypassed accidentally by placing code outside currently protected path patterns?
-19. Should the project adopt a future canonical implementation layout (for example components/<id>/) to make gate coverage easier?
-20. Is CODEOWNERS coverage sufficient for governance/workflow files once GitHub owner enables required Code Owner review?
-21. Current repository rulesets are empty. Confirm that CI alone is NOT hard merge enforcement until main requires the Research Gate status check.
-22. Is the enforcement design proportionate to MP, or has it become process-heavy enough to slow small experiments?
-
-### Required reviewer distinction
-Classify any finding as:
-- POLICY flaw,
-- AUTOMATION flaw,
-- GITHUB CONFIGURATION gap,
-- PROCESS OVERHEAD suggestion.
-
-Do not treat the absence of current branch protection as a code defect in the policy. It is an explicit owner-configuration gap.
-
-
-## Repair review after MP/review-001/AI-B
-
-Review the repaired candidate specifically against:
-
-### MP-R01
-Expected:
-- main.py => protected
-- tools/new_detector.py => protected
-- governance/evil.py => protected
-- unknown non-document artifact => fail closed unless explicitly classified/exempted.
-
-### MP-R02
-Expected:
-- historical Build Request not changed in current diff cannot authorize a new protected file,
-- authorized_files are exact paths, not globs,
-- component_id must match Research Record,
-- Research Record contents are pinned by SHA-256,
-- authorization records decision_id/source/state_version/subject_version,
-- NARROW_REPAIR may reuse Research Record but requires a current per-change Build Request.
-
-### MP-R03
-Expected CODEOWNERS:
-- /scripts/check_research_gate.py @FJ899
-- /tests/test_research_gate.py @FJ899
-- /.github/CODEOWNERS @FJ899
-plus existing governance/workflow/records coverage.
-
-### MP-R04
-Expected validation:
-- YYYY-MM-DD placeholder rejected,
-- invalid calendar date rejected,
-- blank query rejected,
-- invalid integration_role rejected,
-- DONE with no candidates rejected,
-- NO_RESULT with candidates rejected.
-
-### Separation
-Do not interpret Research Gate PASS as M1 DONE.
-M1 remains OPEN and Architecture v0.1 remains NOT_READY.
-
-
-## Final MP-R01 repair review — cycle 2/2
-
-Source:
-MP/review-002/AI-B
-
-Verify only the remaining MP-R01 gap and regression impact.
-
-### Counterexamples that must now be protected
-
-- experiments/requirements.txt
-- docs/package.json
-- governance/docker-compose.yml
-- research/environment.yml
-- contracts/adapter.draft.py
-
-### Draft artifact that must remain exempt
-
-- contracts/candidate_event.schema.draft.json
-
-### Required Git behavior
-
-A diff adding:
-experiments/requirements.txt
-
-without a current Build Request must produce:
-FAIL
-and identify the manifest as protected.
-
-### Ordering requirement
-
-Classification order must enforce:
-1. exact enforcement exemptions,
-2. dependency/runtime manifests,
-3. contract draft rule,
-4. canonical protected paths,
-5. executable/code suffixes,
-6. generic governance/research/docs data exemptions,
-7. safe documentation suffixes,
-8. fail-closed default.
-
-### Cycle limit
-
-This is repair-review cycle 2/2.
-If a remaining BLOCKING/MAJOR defect is found, return it clearly; AI-A must escalate to HUMAN rather than automatically perform a third repair loop.
+After review, HUMAN decides whether to accept M1 result and authorize any next phase.

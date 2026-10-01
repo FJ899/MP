@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 12
+state_version: 13
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_01_proposal_revision_2, M2_01_status_semantics, frame_identity_procedure, state_version, next_action
+changed_fields: M2_01_proposal_revision_3, enumeration_order_timestamp_integrity, saved_PNG_pixel_chain, state_version, next_action
 
 ## Approved goal
 
@@ -72,7 +72,7 @@ MP Architecture v0.1:
 NOT READY TO FREEZE / NOT AUTHORIZED TO FREEZE
 
 M2_01:
-PROPOSAL_REVISION_2_READY_FOR_HUMAN_DECISION
+PROPOSAL_REVISION_3_READY_FOR_REVIEW
 
 M2_execution:
 NOT AUTHORIZED
@@ -107,7 +107,7 @@ proposal_artifact:
 M2_01_EXECUTION_PROPOSAL.md
 
 proposal_status:
-REVISION_2 / PENDING HUMAN DECISION
+REVISION_3 / PENDING AI-B REVIEW
 
 ## M2-01 input availability
 
@@ -171,30 +171,37 @@ NOT REQUIRED.
 ## M2-01 proposal review
 
 review_packet:
-MP/m2-01-proposal-review-001/AI-B
+MP/m2-01-proposal-review-002/AI-B
 
 review_result:
-PROPOSAL_DIRECTION_ACCEPTED / REVISION_REQUIRED
+REQUEST_CHANGES
 
 revision_completed:
 YES
 
 proposal_revision:
-2
+3
 
-Key corrections recorded:
-- 10/30/50/70/90% targets are derived from the observed selected-stream timestamp range T_min..T_max, not from zero;
-- raw PTS and best_effort_timestamp remain distinct;
-- both enumeration_ordinal and presentation_ordinal are preserved;
-- exact extraction uses decoded-frame ordinal selection, not approximate seek;
-- source/frame identity, decoded-pixel equality and PNG-byte equality are evaluated separately;
-- current pre-execution state is NOT_STARTED / BLOCKED_BY_INPUT, not INCONCLUSIVE.
+Prior revision-2 corrections remain preserved.
+
+New revision-3 corrections:
+- selected timestamp integrity is now inspected in original enumeration_ordinal order before any sorting;
+- every MISSING, DUPLICATE and REGRESSION timestamp event is retained with ordinal/value evidence;
+- sorting into presentation_ordinal is used only for deterministic sample selection and cannot erase anomalies from PASS evaluation;
+- every timestamp regression requires diagnosis before PASS;
+- duplicate timestamps do not automatically fail if frame identity remains unambiguous through ordinal evidence;
+- PNG extraction now explicitly inserts format=rgb24;
+- source selected-frame pixels are hashed as explicit RGB24 rawvideo;
+- every saved PNG is decoded back to RGB24 and its pixel hash + dimensions are compared against the selected source-frame RGB24 evidence;
+- PNG file SHA remains a separate byte-container check.
 
 No experiment command was executed as part of this revision.
 
 ## Next action
 
-HUMAN reviews M2_01_EXECUTION_PROPOSAL.md revision 2 and returns one of:
+AI-B reviews M2_01_EXECUTION_PROPOSAL.md revision 3.
+
+After proposal review PASS, HUMAN may return one of:
 - AUTHORIZE_M2_01
 - ACCEPT_PLAN_ONLY
 - REQUEST_CHANGES

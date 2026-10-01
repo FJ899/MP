@@ -55,7 +55,7 @@ EXEMPT_EXACT = {
     "AGENTS.md",
 }
 
-EXEMPT_PREFIXES = (
+GOVERNANCE_DATA_PREFIXES = (
     "research/",
     "governance/",
     "audits/",
@@ -63,6 +63,14 @@ EXEMPT_PREFIXES = (
     "experiments/",
     "docs/",
 )
+
+GOVERNANCE_DATA_SUFFIXES = {
+    ".json",
+    ".yaml",
+    ".yml",
+    ".csv",
+    ".tsv",
+}
 
 SAFE_METADATA_EXACT = {
     "README.md",
@@ -190,8 +198,11 @@ def is_protected(path: str) -> bool:
     if path in EXEMPT_EXACT or path in SAFE_METADATA_EXACT:
         return False
 
-    if path.startswith(EXEMPT_PREFIXES):
-        return False
+    if path.startswith(GOVERNANCE_DATA_PREFIXES):
+        if suffix in SAFE_NON_IMPLEMENTATION_SUFFIXES or suffix in GOVERNANCE_DATA_SUFFIXES:
+            return False
+        # Code/executable or unknown artifact under governance/research is
+        # intentionally NOT exempt; fall through to fail-closed protection.
 
     if path.startswith("contracts/"):
         return ".draft." not in name

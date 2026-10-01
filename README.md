@@ -1,4 +1,4 @@
-# MP — Frankenstein Inspection Lab
+# MP
 
 Repozytorium robocze do audytu i integracji istniejących narzędzi analizy materiału z lotu inspekcyjnego.
 

@@ -22,7 +22,7 @@ Primary video path:
 - masks / propagated masklets for tracked object regions
 
 ## Integration implication
-For the first Frankenstein, SAM2 is better treated as downstream evidence enrichment after a candidate region exists, not as a fourth independent defect detector.
+For the first MP pipeline, SAM2 is better treated as downstream evidence enrichment after a candidate region exists, not as a fourth independent defect detector.
 
 ## Adapter hypothesis
 THIN-MODERATE:

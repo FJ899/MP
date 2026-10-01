@@ -117,3 +117,49 @@ Expected validation:
 ### Separation
 Do not interpret Research Gate PASS as M1 DONE.
 M1 remains OPEN and Architecture v0.1 remains NOT_READY.
+
+
+## Final MP-R01 repair review — cycle 2/2
+
+Source:
+MP/review-002/AI-B
+
+Verify only the remaining MP-R01 gap and regression impact.
+
+### Counterexamples that must now be protected
+
+- experiments/requirements.txt
+- docs/package.json
+- governance/docker-compose.yml
+- research/environment.yml
+- contracts/adapter.draft.py
+
+### Draft artifact that must remain exempt
+
+- contracts/candidate_event.schema.draft.json
+
+### Required Git behavior
+
+A diff adding:
+experiments/requirements.txt
+
+without a current Build Request must produce:
+FAIL
+and identify the manifest as protected.
+
+### Ordering requirement
+
+Classification order must enforce:
+1. exact enforcement exemptions,
+2. dependency/runtime manifests,
+3. contract draft rule,
+4. canonical protected paths,
+5. executable/code suffixes,
+6. generic governance/research/docs data exemptions,
+7. safe documentation suffixes,
+8. fail-closed default.
+
+### Cycle limit
+
+This is repair-review cycle 2/2.
+If a remaining BLOCKING/MAJOR defect is found, return it clearly; AI-A must escalate to HUMAN rather than automatically perform a third repair loop.

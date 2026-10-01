@@ -54,3 +54,23 @@ Human decision:
 - targeted search is mandatory before designing each major component,
 - broad ecosystem scan is periodic only, normally weekly or biweekly when useful,
 - do not run a daily broad "AI drone repo" search that creates noise without a decision hinge.
+
+## D-014 — Research Gate is a merge prerequisite for major build work
+Human intent interpreted from current instruction: search must not be optional memory. Major implementation changes require a durable research record plus build request satisfying VERTICAL + HORIZONTAL search before BUILD.
+
+## D-015 — Layered enforcement
+Project governance uses:
+- AGENTS.md for AI entry instructions,
+- BUILD_POLICY.md as normative contract,
+- structured research/build records for machine validation,
+- GitHub Actions Research Gate for automated checking,
+- PR template/CODEOWNERS for review discipline.
+
+## D-016 — Main branch rules remain a required external configuration
+A CI workflow alone cannot guarantee that an administrator will not bypass or disable it. Strong enforcement requires a GitHub ruleset/branch-protection rule that requires the Research Gate status check and review for governance/workflow changes.
+
+Observed current repo state:
+no repository ruleset configured.
+
+Connector limitation:
+current GitHub integration exposes ruleset reads but not ruleset/branch-protection writes.

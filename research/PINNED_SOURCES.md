@@ -13,7 +13,7 @@ Purpose: bind M1 source-derived claims to exact repository identities. A pinned 
 | Video framework | abhiTronix/vidgear | master | 549de2b1fb70f25e7a0e29fd55159256c3e0b4a4 | park | Apache-2.0 |
 | UAV quality reference | fwan133/IIQC | master | b60ddf0aebe8bdafcdbf2e0122d51c63b60462c8 | reference implementation | project-wide license UNRESOLVED; package.xml says TODO and source contains mixed inherited notices |
 | UAV quality metrics | GattuPriyanka/Framework-for-UAV-image-quality | main | 9344d90ca9f56bf7bd54623b090c794c8c68d3f9 | reference / park | no LICENSE found |
-| BRISQUE quality score | rehanguha/brisque | master | 42c854ef9278f09d047abb8600d5204f779eca52 | M2 evaluation candidate | Apache-2.0 |
+| BRISQUE quality score | rehanguha/brisque | master | 42c854ef9278f09d047abb8600d5204f779eca52 | M2 evaluation candidate | code Apache-2.0; bundled svm.txt + normalize.pickle provenance/terms UNRESOLVED |
 | Anomaly | open-edge-platform/anomalib | main | 1f503a6c3614e2637472cdb6d9ca21054c83ac26 | M2 evaluation candidate | Apache-2.0 code; pretrained backbone weights license remains transitive/model-specific |
 | Anomaly+VLM pattern | AliAbdien/AI-Visual-Inspector | main | 100f7468ca110b9e8bee65a2b4767b8eda198cc4 | reference implementation | no LICENSE found |
 | Sliced inference | obss/sahi | main | 80ebdb699851facf87def03c0597e1aeb87a9a2d | optional M2 mode | MIT |
@@ -53,3 +53,29 @@ Purpose: bind M1 source-derived claims to exact repository identities. A pinned 
 - UNRESOLVED is intentional evidence state, not permission to guess.
 - Code license and model/checkpoint/data license are separate facts.
 - A repository with no clear license may still be used as a reference for mechanisms, but should not become a code dependency until terms are resolved.
+
+
+## BRISQUE bundled model artifacts
+
+Repository:
+rehanguha/brisque
+
+Pinned code commit:
+42c854ef9278f09d047abb8600d5204f779eca52
+
+Default runtime artifacts loaded by BRISQUE.__init__():
+- brisque/models/svm.txt
+  - git blob: 19237f04eae11398a2a41b91a7ef8ad2bfc084d5
+- brisque/models/normalize.pickle
+  - git blob: 18ed3adf6991d0feba7b3cb832a247209f9f5cf1
+
+Both artifacts first appear in repository history in commit:
+10e2dd2a23ee597e788761b161bec1c60aa046fd
+("Made a package out of the code and added the models.")
+
+Status:
+MODEL_ARTIFACT_PROVENANCE_AND_TERMS_UNRESOLVED.
+
+M1 does not independently establish whether the root Apache-2.0 terms cover or exclude these bundled model/data artifacts.
+
+M2-02 must not use the default model until this boundary is resolved or a custom model with acceptable pinned provenance/terms is supplied.

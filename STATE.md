@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 5
+state_version: 6
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT
-changed_fields: research_gate_repairs, review_findings, governance_enforcement, state_version, next_action
+changed_fields: second_repair_cycle, MP-R01_classification, regression_tests, state_version, next_action
 
 ## Approved goal
 Sprawdzić, czy z istniejących narzędzi można złożyć minimalne laboratorium, które przyjmuje materiał z lotu inspekcyjnego, analizuje go kilkoma komplementarnymi metodami, łączy wyniki i przekazuje operatorowi ograniczoną listę miejsc CONFIRM / REJECT / RECHECK.
@@ -133,16 +133,26 @@ Therefore hard merge enforcement on main is PENDING OWNER CONFIGURATION after re
 
 ## Research Gate repair status
 
-AI-B review MP/review-001/AI-B returned REQUEST_CHANGES.
+AI-B review MP/review-001/AI-B:
+REQUEST_CHANGES.
 
-Repair status:
-- MP-R01 unknown implementation locations: REPAIRED / PENDING_REVIEW
-- MP-R02 stale/broad authorization reuse: REPAIRED / PENDING_REVIEW
-- MP-R03 CODEOWNERS gaps: REPAIRED / PENDING_REVIEW
-- MP-R04 weak record validation: REPAIRED / PENDING_REVIEW
+AI-B review MP/review-002/AI-B:
+REQUEST_CHANGES limited to MP-R01 classification precedence/draft exemption.
 
-Additional self-found hardening:
-- executable code hidden under governance/research paths is no longer broadly exempt.
+repair_review_cycle:
+2 of maximum 2.
+
+Current finding status:
+- MP-R01 manifest/draft classification: REPAIRED / PENDING_FINAL_REVIEW
+- MP-R02 stale/broad authorization reuse: RESOLVED_BY_REVIEW
+- MP-R03 CODEOWNERS gaps: RESOLVED_BY_REVIEW
+- MP-R04 weak record validation: RESOLVED_BY_REVIEW
+
+MP-R01 second repair:
+- dependency/runtime manifest recognition now precedes generic documentation/data exemptions,
+- contract draft exemption is restricted to JSON/YAML/YML/Markdown design artifacts,
+- executable *.draft.py remains protected,
+- regression tests include the four AI-B counterexamples plus a Git test for experiments/requirements.txt without Build Request.
 
 M1 status:
 OPEN.
@@ -157,4 +167,8 @@ GitHub enforcement:
 - hard merge enforcement remains owner-configuration work after review.
 
 ## Next action
-AI-B repair review of Research Gate candidate; after gate review, continue unfinished M1 Technology Reconnaissance separately.
+Final AI-B repair review for MP-R01.
+
+If another blocking/major Research Gate defect remains after this second repair-review cycle, do not enter a third automatic repair loop. Escalate a BLOCKER_DECISION to HUMAN under TWO-WEBAI limits.
+
+M1 Technology Reconnaissance remains a separate OPEN activity.

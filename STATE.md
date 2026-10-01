@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 4
+state_version: 5
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT
-changed_fields: governance_enforcement, research_gate_automation, state_version, next_action
+changed_fields: research_gate_repairs, review_findings, governance_enforcement, state_version, next_action
 
 ## Approved goal
 Sprawdzić, czy z istniejących narzędzi można złożyć minimalne laboratorium, które przyjmuje materiał z lotu inspekcyjnego, analizuje go kilkoma komplementarnymi metodami, łączy wyniki i przekazuje operatorowi ograniczoną listę miejsc CONFIRM / REJECT / RECHECK.
@@ -131,5 +131,30 @@ Repository ruleset status observed on 2026-10-01:
 
 Therefore hard merge enforcement on main is PENDING OWNER CONFIGURATION after review.
 
+## Research Gate repair status
+
+AI-B review MP/review-001/AI-B returned REQUEST_CHANGES.
+
+Repair status:
+- MP-R01 unknown implementation locations: REPAIRED / PENDING_REVIEW
+- MP-R02 stale/broad authorization reuse: REPAIRED / PENDING_REVIEW
+- MP-R03 CODEOWNERS gaps: REPAIRED / PENDING_REVIEW
+- MP-R04 weak record validation: REPAIRED / PENDING_REVIEW
+
+Additional self-found hardening:
+- executable code hidden under governance/research paths is no longer broadly exempt.
+
+M1 status:
+OPEN.
+Technology Reconnaissance remains incomplete and is not closed by this governance repair.
+
+MP Architecture v0.1:
+NOT READY TO FREEZE.
+
+GitHub enforcement:
+- repository rulesets observed: []
+- classic branch protection: UNAVAILABLE through connector (403)
+- hard merge enforcement remains owner-configuration work after review.
+
 ## Next action
-Independent review of M1 Technology Reconnaissance plus the new Research Gate enforcement design on branch audit/m1-repo-suitability-v2.
+AI-B repair review of Research Gate candidate; after gate review, continue unfinished M1 Technology Reconnaissance separately.

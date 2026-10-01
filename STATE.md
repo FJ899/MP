@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 9
+state_version: 10
 goal_version: 1
 project_profile: REPO_INTEGRATION
-work_mode: AUDIT
-changed_fields: MP-M1-001_BRISQUE_model_boundary, M1_D3_D5_coverage, M2_02_precondition, state_version, next_action
+work_mode: AUDIT / M2_TRANSITION_PLANNING
+changed_fields: M1_human_acceptance, accepted_M1_version, current_phase, M2_01_proposal_status, material_availability, environment_availability, state_version, next_action
 
 ## Approved goal
 
@@ -15,42 +15,10 @@ Sprawdzić, czy z istniejących narzędzi można złożyć minimalne laboratoriu
 Hypothesis:
 Czy MP wyławia z 30 minut filmu miejsca, którym człowiek rzeczywiście powinien przyjrzeć się ponownie?
 
-## Current scope
+## Research Gate
 
-CURRENT:
-- post-flight video analysis
-- video/frame provenance
-- quality-gate research
-- anomaly detection
-- known-defect detection research
-- sliced inference research
-- segmentation/tracking
-- merger/deduplication
-- CandidateEvent evidence
-- operator CONFIRM / REJECT / RECHECK
-
-RESEARCH-ONLY / LATER:
-- Air 3S telemetry integration
-- route/WPML/KMZ automation
-- autonomous reinspection
-- COLMAP/full 3D
-- edge deployment
-- thermal/multisensor
-- production GUI/productization
-
-## Working method
-
-For every major component:
-
-PROBLEM
-→ VERTICAL SEARCH + HORIZONTAL SEARCH
-→ INSPECT / RUN where justified
-→ COMPARE
-→ USE / ADAPT / LEARN / REJECT / PARK
-→ BUILD only when existing solutions are insufficient.
-
-Research Gate technical repair:
-HUMAN-ACCEPTED in reviewed scope.
+technical_repair_acceptance:
+HUMAN_ACCEPTED_IN_REVIEWED_SCOPE
 
 accepted_research_gate_version:
 f799d26184504ae890b3a8ab064ad29de9267cbd
@@ -58,96 +26,59 @@ f799d26184504ae890b3a8ab064ad29de9267cbd
 decision_id:
 HUMAN-ARTIFACT-DECISION-RG-001
 
-Known Research Gate limitations remain:
+Known limitations remain:
 - GitHub Actions PASS for accepted artifact was not observed,
 - hard merge enforcement is not verified,
-- classic branch protection is unavailable through connector.
+- classic branch protection is unavailable through connector,
+- future semantic correctness and NARROW_REPAIR classification still require review.
 
-## Current milestone
-
-M1 — TECHNOLOGY RECONNAISSANCE + REPOSITORY SUITABILITY AUDIT
+## M1 artifact decision
 
 m1_status:
-READY_FOR_INDEPENDENT_REVIEW
+HUMAN_ACCEPTED
 
-m1_human_acceptance:
-PENDING
+m1_decision_id:
+HUMAN-ARTIFACT-DECISION-M1-001
 
-m1_result:
-M1_RESULT.md
+m1_decision_source:
+HUMAN_EXPLICIT_ACCEPT
 
-m2_proposal:
-M2_SMOKE_TEST_PLAN.md
+accepted_M1_version:
+c701a8e87ae1f4e067dcabbfd3902bc35b43de19
+
+accepted_review:
+MP/m1-repair-review-001/AI-B
+
+accepted_review_verdict:
+PASS
+
+acceptance_scope:
+- first targeted Technology Reconnaissance,
+- Repository Suitability Audit,
+- current EVALUATE / LEARN / PARK set,
+- explicit unresolved dependencies and limitations,
+- M2_SMOKE_TEST_PLAN.md as a proposal/backlog only.
+
+Important:
+the accepted artifact remains exactly c701a8e87ae1f4e067dcabbfd3902bc35b43de19.
+Commits after that version record the HUMAN decision and prepare transition planning; they do not silently redefine the accepted M1 artifact.
+
+## Current phase
+
+current_phase:
+M2 TRANSITION — PROPOSAL ONLY
 
 MP Architecture v0.1:
-NOT READY TO FREEZE
+NOT READY TO FREEZE / NOT AUTHORIZED TO FREEZE
 
-## M1 DONE contract
+M2_01:
+PROPOSAL_IN_PREPARATION
 
-1. Exact source identity or UNRESOLVED.
-2. Verified INPUT -> FUNCTION -> OUTPUT.
-3. Repo license separated from model/weights/data license where relevant.
-4. CPU/GPU requirements recorded from sources.
-5. Training/reference/prompt/downstream dependencies identified.
-6. Adapter need classified.
-7. Each serious EVALUATE/USE/ADAPT tied to RECHECK hypothesis.
-8. No speculative component retained only for future value.
-9. COLMAP/telemetry remain non-blocking.
-10. Concrete M2 smoke-test candidate list produced.
-11. Major problem areas have recorded Vertical/Horizontal searches including NO_RESULT where applicable.
-12. Serious Radar candidates record required decision fields.
-13. Rejected candidates retain WHY/evidence; no false REJECT is required when PARK is correct.
-14. Any custom BUILD proposal must prove existing solutions insufficient.
-15. Architecture is not frozen before independent review + HUMAN decision.
-
-Coverage claim:
-see M1_RESULT.md.
-It remains a claim for AI-B to verify, not self-acceptance.
-
-## Proposed M2 candidate set
-
-EVALUATE after future authorization:
-- FFmpeg
-- OpenCV
-- BRISQUE
-- Anomalib PatchCore
-- SAM2.1 Hiera Small
-- Weighted Boxes Fusion
-- Norfair
-
-BLOCKED:
-known-defect detector until task-relevant checkpoint/license or separately authorized training path exists.
-
-PARK:
-- VLM
-- CVAT
-- telemetry
-- route generation
-- COLMAP/3D
-- extra tracker/VOS alternatives unless a smoke test exposes a gap.
-
-## Authorization
-
-audit_read:
-AUTHORIZED
-
-technology_reconnaissance:
-AUTHORIZED
-
-repository_suitability_audit:
-AUTHORIZED
-
-prepare_M1_for_review:
-AUTHORIZED
-
-M1 acceptance:
-PENDING HUMAN
-
-M2 execution:
+M2_execution:
 NOT AUTHORIZED
 
-dependency installation:
-NOT AUTHORIZED by this state
+dependency_installation:
+NOT AUTHORIZED
 
 implementation:
 NOT AUTHORIZED
@@ -155,57 +86,94 @@ NOT AUTHORIZED
 merge_to_main:
 NOT AUTHORIZED
 
-architecture_freeze:
-NOT AUTHORIZED
-
 publish/release/deploy:
 NOT AUTHORIZED
 
-flight/route execution:
+flight/route_execution:
 NOT AUTHORIZED
 
-## Execution status
+## Proposed first experiment
 
-MP execution of proposed M2 components:
-NOT_RUN
+experiment_id:
+M2-01
 
-End-to-end MP pipeline:
-NOT_BUILT / NOT_RUN
+name:
+Video Timestamp Integrity
 
-No source README claim is promoted to MP runtime evidence.
+goal:
+Sprawdzić powtarzalne powiązanie klatki z czasem i źródłowym materiałem, potrzebne dla dowodów RECHECK.
 
-## Material open gaps
+proposal_artifact:
+M2_01_EXECUTION_PROPOSAL.md
 
-- BRISQUE default svm.txt + normalize.pickle provenance/terms unresolved; M2-02 default-model execution is conditional on resolving this boundary or using a custom model with pinned acceptable provenance/terms;
-- exact licensed task-relevant known-defect checkpoint unresolved;
-- PatchCore pretrained backbone identity/terms must be pinned before execution;
-- no MP hardware benchmarks;
-- no actual Air 3S video/log compatibility execution in M1;
-- no accepted quality thresholds;
-- CandidateEvent semantic merger remains an open integration hypothesis;
-- some reference repos have unresolved/no top-level license.
+proposal_status:
+PENDING HUMAN DECISION
 
-## Current M1 review correction
+## M2-01 input availability
 
-AI-B packet:
-MP/m1-review-001/AI-B
+required_input:
+one native DJI Air 3S MP4 clip, 30–60 seconds.
 
-verdict:
-REQUEST_CHANGES
+repository_scan:
+NO VIDEO FILE FOUND in FJ899/MP at accepted M1 candidate.
 
-open finding:
-MP-M1-001 — BRISQUE default model artifacts were not separately captured under D3/D5.
+conversation/library search:
+NO NATIVE AIR 3S MP4 FOUND.
+Search returned documentation/reports but no relevant video artifact.
 
-repair:
-DOCUMENTATION_ONLY / PENDING_REVIEW
+input_status:
+MISSING / BLOCKS AIR 3S COMPATIBILITY EXECUTION.
 
-No installation, model training, dependency change or M2 execution was performed.
+Substitute video:
+may test generic procedure only;
+must NOT be used as evidence of Air 3S compatibility.
+
+## M2-01 execution environment availability
+
+Observed environment without installing anything:
+
+ffmpeg:
+7.1.5-0+deb13u1
+
+ffprobe:
+7.1.5-0+deb13u1
+
+ffmpeg build note:
+Debian build reports --enable-gpl.
+This binary identity must be recorded in experiment evidence and is not assumed identical to the M1 pinned FFmpeg source commit.
+
+python:
+3.13.5
+
+opencv_python:
+4.13.0
+
+minimal_M2_01_installation_need:
+NONE for the proposed ffprobe/ffmpeg path.
+
+OpenCV:
+available but optional for M2-01; not required for the minimal first execution proposal.
+
+GPU:
+NOT REQUIRED.
+
+## Preserved limitations from accepted M1
+
+- BRISQUE default model provenance/terms: UNRESOLVED.
+- PatchCore exact backbone identity/terms: PRECONDITION.
+- known-defect checkpoint/license: BLOCKED.
+- Air 3S compatibility: NOT_TESTED.
+- quality thresholds: NOT_ACCEPTED.
+- CandidateEvent integration semantics: OPEN HYPOTHESIS.
+- M2 runtime evidence: NOT_RUN.
+- MP end-to-end: NOT_BUILT / NOT_RUN.
 
 ## Next action
 
-AI-B performs focused repair review of MP-M1-001, then continues the independent M1 artifact review decision.
+Prepare and present M2_01_EXECUTION_PROPOSAL.md for HUMAN decision.
 
-After AI-B review:
-HUMAN decides whether to ACCEPT / REQUEST_CHANGES / DEFER the M1 result and whether any M2 smoke execution should be authorized.
+Do not execute M2-01 until:
+1. HUMAN explicitly authorizes M2-01 execution, and
+2. a native Air 3S clip is available if the result is intended to establish Air 3S compatibility.
 
-No architecture freeze or implementation occurs before that decision.
+No installation, extraction, decoding experiment or evidence generation is authorized by M1 acceptance alone.

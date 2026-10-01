@@ -124,3 +124,39 @@ contracts/adapter.draft.py remains protected.
 ## D-023 — Second repair-review cycle is final automatic loop
 This is repair-review cycle 2 of the protocol maximum 2.
 If AI-B still identifies a blocking/major Research Gate defect after this candidate, AI-A must escalate to HUMAN instead of silently starting a third repair cycle.
+
+
+## D-024 — HUMAN accepts Research Gate repair MP-R01–MP-R04
+
+decision_id:
+HUMAN-ARTIFACT-DECISION-RG-001
+
+source:
+HUMAN_EXPLICIT_ACCEPT
+
+subject_version:
+f799d26184504ae890b3a8ab064ad29de9267cbd
+
+artifact_decision:
+ACCEPT
+
+acceptance_scope:
+Techniczna naprawa Research Gate MP-R01–MP-R04, reviewed by AI-B in MP/review-003/AI-B.
+
+This acceptance does NOT authorize:
+- merge,
+- BUILD orchestrator,
+- product implementation,
+- release/deploy/publication,
+- M1 closure,
+- MP Architecture v0.1 freeze.
+
+Preserved limitations:
+- GitHub Actions PASS not observed,
+- hard merge enforcement not verified,
+- classic branch protection unavailable through current connector,
+- process records do not cryptographically prove human intent,
+- semantic correctness of future code still requires review.
+
+Next approved project activity:
+continue unfinished M1 Technology Reconnaissance.

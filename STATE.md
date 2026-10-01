@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 10
+state_version: 11
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M1_human_acceptance, accepted_M1_version, current_phase, M2_01_proposal_status, material_availability, environment_availability, state_version, next_action
+changed_fields: M2_01_proposal_ready, state_version, next_action
 
 ## Approved goal
 
@@ -72,7 +72,7 @@ MP Architecture v0.1:
 NOT READY TO FREEZE / NOT AUTHORIZED TO FREEZE
 
 M2_01:
-PROPOSAL_IN_PREPARATION
+PROPOSAL_READY_FOR_HUMAN_DECISION
 
 M2_execution:
 NOT AUTHORIZED
@@ -170,7 +170,11 @@ NOT REQUIRED.
 
 ## Next action
 
-Prepare and present M2_01_EXECUTION_PROPOSAL.md for HUMAN decision.
+HUMAN reviews M2_01_EXECUTION_PROPOSAL.md and returns one of:
+- AUTHORIZE_M2_01
+- ACCEPT_PLAN_ONLY
+- REQUEST_CHANGES
+- DEFER
 
 Do not execute M2-01 until:
 1. HUMAN explicitly authorizes M2-01 execution, and

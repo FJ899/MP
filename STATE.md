@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 8
+state_version: 9
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT
-changed_fields: M1_reconnaissance_result, M1_review_candidate, M2_smoke_proposal, source_pins, next_action
+changed_fields: MP-M1-001_BRISQUE_model_boundary, M1_D3_D5_coverage, M2_02_precondition, state_version, next_action
 
 ## Approved goal
 
@@ -176,6 +176,7 @@ No source README claim is promoted to MP runtime evidence.
 
 ## Material open gaps
 
+- BRISQUE default svm.txt + normalize.pickle provenance/terms unresolved; M2-02 default-model execution is conditional on resolving this boundary or using a custom model with pinned acceptable provenance/terms;
 - exact licensed task-relevant known-defect checkpoint unresolved;
 - PatchCore pretrained backbone identity/terms must be pinned before execution;
 - no MP hardware benchmarks;
@@ -184,9 +185,25 @@ No source README claim is promoted to MP runtime evidence.
 - CandidateEvent semantic merger remains an open integration hypothesis;
 - some reference repos have unresolved/no top-level license.
 
+## Current M1 review correction
+
+AI-B packet:
+MP/m1-review-001/AI-B
+
+verdict:
+REQUEST_CHANGES
+
+open finding:
+MP-M1-001 — BRISQUE default model artifacts were not separately captured under D3/D5.
+
+repair:
+DOCUMENTATION_ONLY / PENDING_REVIEW
+
+No installation, model training, dependency change or M2 execution was performed.
+
 ## Next action
 
-AI-B performs independent M1 review of the pinned candidate artifacts.
+AI-B performs focused repair review of MP-M1-001, then continues the independent M1 artifact review decision.
 
 After AI-B review:
 HUMAN decides whether to ACCEPT / REQUEST_CHANGES / DEFER the M1 result and whether any M2 smoke execution should be authorized.

@@ -1,70 +1,91 @@
-# M1 Repository Suitability Matrix
+# M1 Repository Suitability Matrix — Candidate for Review
 
-Status meanings:
+Status vocabulary:
 - SOURCE_INSPECTED
 - INSTALL_NOT_RUN / INSTALL_VERIFIED
-- SMOKE_TEST_NOT_RUN / SMOKE_TEST_PASS / FAIL
+- SMOKE_TEST_NOT_RUN / PASS / FAIL
 - PIPELINE_COMPATIBILITY_NOT_TESTED / VERIFIED
 
-| Component | Actual role | Input | Output | Compute | Adapter | Critical limitation | Current recommendation |
-|---|---|---|---|---|---|---|---|
-| Quality gate | IIQC + simpler UAV quality-metric alternatives | UAV inspection imagery, candidate-specific context | quality metrics / recollection signal | candidate-dependent | TBD | IIQC is not a drop-in blur checker; it includes pose/3D/bridge-specific machinery | TECHNOLOGY RECON |
-| Anomalib / PatchCore | anomaly detection against learned normal reference | image(s) + normal-reference memory bank | anomaly score/map | GPU useful; exact target TBD | THIN-MODERATE | needs representative normal training/reference images | KEEP FOR AUDIT |
-| Defect detector candidates | Ultralytics YOLO is one candidate; BFD-UAV2K benchmark also compares RT-DETR/Faster/Cascade R-CNN | image/video | boxes/classes/confidence, model-dependent | model-dependent | THIN-MODERATE | detector must be selected from task-relevant evidence; framework familiarity is not proof | EVALUATE VIA BENCHMARK |
-| SAHI | sliced inference wrapper around detector | image + detector | merged detections from slices | inherits detector requirements | THIN | not an independent semantic detector | KEEP AS MODE, NOT PARALLEL DETECTOR |
-| SAM2 | promptable segmentation and video propagation; also image mask generation | frame/video + prompt/box for tracked object path | masks / propagated masklets | GPU recommended for useful speed | THIN-MODERATE | video tracking path needs initial prompt/region | KEEP DOWNSTREAM OF CANDIDATE |
-| CVAT | annotation/review tooling | images/video/tasks | human annotations | service/tooling | MODERATE if automated | not part of first inference path | OPTIONAL / LATER |
-| VLM interpretation | local VLM runtime/model to be selected | detector-highlighted image/region + context | descriptive/structured explanation | model/hardware dependent | THIN-MODERATE | may add narrative without improving RECHECK quality; current working hypothesis forbids it from overriding detector verdict | OPTIONAL EXPERIMENT |
-| COLMAP | SfM / poses / reconstruction | overlapping images | camera poses / 3D reconstruction | CPU/GPU workflow-dependent | HEAVY relative to M1 goal | unnecessary until timestamp->telemetry proves insufficient | LATER |
-| Hawk-I | reference implementation integrating related components | mixed | mixed | mixed | REFERENCE ONLY | similarity can bias us toward oversized architecture | REFERENCE |
-| DJI telemetry | candidate parsers found: dji_parse, dji-telemetry, dji-srt2csv, DatCon | MP4/SRT/.DAT depending on candidate | timestamp/GPS/altitude/etc. | mostly CPU | THIN-MODERATE | actual Air 3S recording/log compatibility is unresolved; DatCon warns about newer/encrypted logs | EVALUATE LATER / NON-BLOCKING |
+All rows below are SOURCE_INSPECTED unless explicitly stated otherwise.
+No runtime row is PASS.
 
-## Preliminary source-backed findings
+| Problem area | Strongest candidate/reference | Input | Output | Source requirements / compute | Repo/model license state | Adapter | M1 disposition | RECHECK relevance | Critical limitation |
+|---|---|---|---|---|---|---|---|---|---|
+| Video ingestion | FFmpeg + OpenCV | native video | frames + timestamps + arrays | CPU baseline; HW decode optional | FFmpeg default LGPL-2.1+ config-sensitive; OpenCV Apache-2.0 | THIN | EVALUATE M2 | preserves exact source interval/frame evidence | Air 3S timestamp behavior NOT_TESTED |
+| Quality signal | rehanguha/brisque | image | BRISQUE score | CPU; NumPy/SciPy/scikit-image/libsvm/OpenCV | Apache-2.0 | THIN | EVALUATE M2 | can reject obviously poor evidence before analysis | not a complete quality gate or threshold |
+| Quality architecture | IIQC | UAV inspection image + pose/bridge context | quality/recollection feedback | ROS/pose/3D/PCL/OctoMap context | project license UNRESOLVED | HIGH direct / NONE reference | LEARN | shows quality failure→recollection pattern | too heavy/unclear license for direct first component |
+| Anomaly | Anomalib PatchCore | normal references + test image | anomaly score/map | Python>=3.10; CPU/GPU extras; pretrained backbone | Apache-2.0 code; backbone/model license separate | THIN-MODERATE | EVALUATE M2 | can surface unknown irregularities for RECHECK | needs representative normality; quality artifacts may dominate |
+| VLM authority reference | AI-Visual-Inspector | detector verdict/heatmap + image | descriptive explanation | Anomalib + Ollama/Qwen; hardware model-dependent | no LICENSE found | REFERENCE | LEARN / PARK runtime | useful human explanation without VLM overriding detector | source project license unresolved; no need in first smoke |
+| Known-defect benchmark | BFD-UAV2K | real UAV facade images | detector benchmark metrics | model-dependent | dataset/license PENDING per README | BENCHMARK | EVALUATE evidence | closest task evidence for detector family | no licensed ready checkpoint selected |
+| Detector framework | Ultralytics | image/video + selected weights | boxes/classes/scores | Python/PyTorch; CPU/GPU | AGPL-3.0 code; defect weights/license unresolved | THIN | PARK/BLOCKED | could provide known-defect candidates | generic weights do not prove facade defects |
+| Sliced detector mode | SAHI | image + detector | merged sliced predictions | inherits detector + OpenCV | MIT | THIN | PARK until detector exists | may improve small-defect recall | not independent detector |
+| Temporal mask propagation | SAM2.1 Small | short video + candidate box/prompt | masks/object IDs across frames | Python>=3.10; torch>=2.5.1; GPU recommended | Apache-2.0 code + checkpoints per README | THIN-MODERATE | EVALUATE M2 | supports persistence of one suspicious region | automatic discovery is not its role |
+| VOS alternative | Cutie | frames + initial mask | propagated masks | PyTorch/CUDA-oriented demo | MIT code; weights license not separately established | MODERATE | PARK | alternate persistence mechanism | no reason to test before SAM2 unless gap appears |
+| Same-frame fusion | Weighted Boxes Fusion | model boxes/scores/labels | fused boxes/scores/labels | CPU NumPy/Pandas/Numba | MIT | THIN | EVALUATE M2 | reduces duplicate geometry from analyzers | native output does not preserve MP provenance |
+| Temporal association | Norfair | detections per frame | track IDs/spans | core CPU; custom distance; moving-camera support | BSD-3-Clause | THIN-MODERATE | EVALUATE M2 | groups repeated observations into candidate spans | static defect + moving camera fit unproven |
+| MOT alternative | ByteTrack | detection boxes | MOT tracks | heavier YOLOX/MOT stack; GPU benchmarks | MIT | MODERATE | PARK | possible temporal grouping | benchmark/domain less aligned than Norfair |
+| Spatial dedup reference | tank-inspection-uav | mapped x/y/z defects | deduplicated registry | ROS/3D stack | no LICENSE found | REFERENCE | LEARN | proves simple coordinate-radius dedup pattern | coordinates unavailable in first proof |
+| Persistence reference | AegisInspect | mapped observations | persistent defect records/reports | ROS/LiDAR/3D stack | no LICENSE found | REFERENCE | LEARN | persistent IDs, aggregation, evidence boundaries | avoid importing autonomy/3D scope |
+| Whole-system reference | Hawk-I | camera/detections/GPS | masks/verification/report/dashboard | Jetson + GCS GPU architecture | license UNRESOLVED in inspected source | REFERENCE | LEARN | integration/failure-handling competitor | architecture is much larger than MP first proof |
+| Reinspection reference | dual-UAV pipeline inspection | flagged findings + telemetry | target manifest + second inspection | Tello/YOLO/control stack | MIT | REFERENCE | LEARN | CandidateEvent→recheck-task pattern | autonomous flight out of scope |
+| Revisit policy reference | RDMO Digital Twin | simulated occlusion/inspection state | coverage/time/energy by recovery policy | Unity + model server | no LICENSE found | BENCHMARK | LEARN | shows Hover/Micro/Skip/revisit trade-offs | simulation/pavement context |
+| Annotation | CVAT | image/video task | human labels | service stack | MIT | MODERATE | PARK | useful only if data burden emerges | not needed for first inference smoke |
+| Telemetry | existing DJI parsers | MP4/SRT/DAT | timestamps/GPS/altitude/etc. | mostly CPU | candidate-specific; several MIT | THIN-MODERATE | PARK/NON-BLOCKING | later maps CandidateEvent to flight context | actual Air 3S compatibility unknown |
+| Route generation | WayPoint / DroneRoute / Air3S format research | mission definition | KMZ/WPML/controller mission | app-specific | WayPoint/DroneRoute MIT; format research terms TO VERIFY | MODERATE | PARK | later could automate RECHECK capture | no route execution authorized; Air 3S verification incomplete |
+| 3D | COLMAP | overlapping images | poses/3D reconstruction | CPU/GPU workflow | verify before use | HEAVY | PARK | only if telemetry insufficient | unnecessary for first vision-value proof |
 
-### F-001 — PatchCore reference data
-PatchCore is not "zero preparation anomaly detection". The inspected Anomalib implementation describes a training phase that stores patch features from normal training images in a memory bank, then compares inference images against that bank.
+## Cross-cutting findings
 
-Consequence: anomaly detection may still avoid defect-class labeling, but it requires a useful definition of normality.
+### F-001 — PatchCore needs normal-reference data
+No named defect class is required, but a useful memory bank of normal imagery is.
 
-### F-002 — SAHI role
-SAHI documentation shows an AutoDetectionModel plus get_sliced_prediction and uses Ultralytics as a backend example.
+### F-002 — SAHI is a detector mode, not a second detector
+Compare direct detector vs detector+slicing. Do not double-count it as independent evidence.
 
-Consequence: model the path as YOLO direct vs YOLO+SAHI sliced inference, not YOLO and SAHI as two independent detectors.
+### F-003 — SAM2 belongs downstream of candidate generation
+Its clean first role is box/prompt→mask propagation.
 
-### F-003 — SAM2 role
-SAM2 video workflow is promptable: initialize video state, add point/box prompts, then propagate masks through video. Automatic mask generation also exists for images.
+### F-004 — VLM should not be a default second vote
+AI-Visual-Inspector provides a working reference for detector authority + descriptive VLM. MP still needs evidence before any VLM role is accepted.
 
-Consequence: first candidate architecture should test SAM2 mainly after another mechanism identifies a region/event.
+### F-005 — YOLO is not an architectural decision
+BFD-UAV2K reports different strengths for YOLO and RT-DETR. Generic pretrained YOLO does not prove defect capability.
 
-### F-004 — Hawk-I role
-Hawk-I documents an inspection stack combining YOLO, YOLO-World, SAM2.1, DINOv2, Gemma 3/Ollama, GPS/MAVLink and reporting.
+### F-006 — Merger is decomposable but not fully solved
+Existing components cover:
+- same-frame fusion,
+- temporal association,
+- prompted mask continuity,
+- later spatial dedup.
 
-Consequence: use it to inspect integration patterns and failure modes, not as the target architecture by default.
+The MP-specific gap is provenance-preserving CandidateEvent semantics across these observations. BUILD remains unauthorized.
 
-## Not yet verified
-- exact licenses for every repository and every model weight
-- exact current commit/tag to freeze for M1
-- installation success
-- inference success
-- compatibility on our flight footage
-- detector weights/classes for crack/spalling/corrosion
-- Gemma 3 exact model artifact
-- DJI flight-log parser identity
+### F-007 — Search-before-build prevented unnecessary custom work
+Likely custom work removed or postponed:
+- ingestion framework,
+- image-quality model,
+- mask tracker,
+- generic box fusion,
+- generic MOT tracker,
+- telemetry parser,
+- KMZ generator.
 
+### F-008 — Licensing changes component roles
+Examples:
+- IIQC: useful LEARN reference but direct dependency licensing unclear.
+- Hawk-I/AegisInspect: architecture references, not code dependencies.
+- BFD-UAV2K: benchmark evidence but data use remains license-pending.
+- SAM2: unusually clear code+checkpoint terms among segmentation candidates.
 
-### F-005 — Search-before-build correction
-Current component names are candidate classes, not frozen architecture choices. Before custom implementation each major component must pass VERTICAL + HORIZONTAL reconnaissance and compare USE/ADAPT/LEARN/REJECT/PARK options.
+## Execution state
 
-### F-006 — Air 3S route-generation evidence
-WayPoint README explicitly lists Air 3S support.
-DroneRoute provides WPML/KMZ and controller upload but its current supported-drone list does not include Air 3S.
-drone-mission-planning documents Air 3S mission-format research but explicitly states calibration awaits a real Air 3S dummy mission.
+INSTALL_NOT_RUN:
+all proposed M2 candidates.
 
-Consequence: custom KMZ generation is not justified now, but none of these three may yet be treated as a verified MP route component.
+SMOKE_TEST_NOT_RUN:
+all proposed M2 candidates.
 
-### F-007 — BFD-UAV2K changes detector selection
-BFD-UAV2K is a 2,000-image real UAV facade benchmark comparing YOLO-family detectors, RT-DETR-L and two-stage detectors. Its published results show different speed/localization/recall trade-offs.
+PIPELINE_COMPATIBILITY_NOT_TESTED:
+all proposed M2 candidates.
 
-Consequence: "YOLO because we know YOLO" is removed as an architectural assumption.
-
-License caveat: README states license information will be added with the official public release.
+No statement in this matrix means MP currently works end-to-end.

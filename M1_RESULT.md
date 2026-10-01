@@ -24,7 +24,7 @@ Existing components can test most early uncertainties:
    FFmpeg + OpenCV
 
 2. one existing image-quality signal:
-   BRISQUE
+   BRISQUE, subject to a separate default-model provenance/license precondition
 
 3. unknown-irregularity branch:
    Anomalib / PatchCore
@@ -101,7 +101,7 @@ Existing parsers/mission generators already reduce the risk of later reinventing
 |---|---|---|---|
 | ingestion | FFmpeg/OpenCV | EVALUATE M2 | minimal mature decode/frame path |
 | scene detection | PySceneDetect | PARK | scene cuts != defect/recheck events |
-| quality | BRISQUE | EVALUATE M2 | small Apache-2.0 existing signal |
+| quality | BRISQUE | EVALUATE M2 WITH PRECONDITION | code Apache-2.0; default SVM/normalization artifacts separately unresolved |
 | quality architecture | IIQC | LEARN | closest recollection pattern; direct dependency too heavy/license unclear |
 | anomaly | PatchCore | EVALUATE M2 | unknown irregularity test with normal-reference bank |
 | VLM pattern | AI-Visual-Inspector | LEARN / PARK runtime | detector decides, VLM explains |
@@ -150,9 +150,10 @@ SOURCE_INSPECTED only. Runtime compatibility is not implied.
 ### D3 — repository license separated from model/weights/data license
 
 Status:
-SATISFIED AS AN EVIDENCE SEPARATION.
+SATISFIED AFTER MP-M1-001 CORRECTION, SUBJECT TO REVIEW.
 
 Examples:
+- BRISQUE: repository/code context Apache-2.0; bundled svm.txt + normalize.pickle provenance/terms are separately UNRESOLVED.
 - SAM2: code + checkpoints explicitly Apache-2.0 in source README.
 - Anomalib: code Apache-2.0; pretrained backbone/model terms remain separate and unresolved before execution.
 - Ultralytics: code AGPL-3.0; exact defect weights unresolved.
@@ -160,7 +161,7 @@ Examples:
 - Cutie: code MIT; pretrained-weight terms not separately established.
 - IIQC/Hawk-I/AegisInspect: useful references but project license unresolved/no license found.
 
-No UNKNOWN is converted to permission to reuse code/data.
+No UNKNOWN is converted to permission to reuse code/data/model artifacts.
 
 ### D4 — CPU/GPU requirements sourced
 
@@ -181,9 +182,10 @@ MP hardware benchmarks are NOT_RUN.
 ### D5 — training/reference/weights/prompt/downstream dependencies identified
 
 Status:
-SATISFIED.
+SATISFIED AFTER MP-M1-001 CORRECTION, SUBJECT TO REVIEW.
 
 Key dependencies:
+- BRISQUE default path needs bundled svm.txt + normalize.pickle; their provenance/terms remain unresolved before M2-02.
 - PatchCore needs normal-reference images + pretrained backbone.
 - SAM2 needs candidate prompt/box and checkpoint.
 - WBF needs detector boxes/scores/labels.
@@ -308,29 +310,32 @@ These are not silently treated as solved:
 1. Known-defect execution:
    task-relevant checkpoint + license unresolved.
 
-2. PatchCore model chain:
+2. BRISQUE model chain:
+   default svm.txt + normalize.pickle provenance/terms must be resolved before M2-02 default-model execution.
+
+3. PatchCore model chain:
    exact pretrained backbone identity/terms must be pinned before M2 execution.
 
-3. Runtime:
+4. Runtime:
    all proposed M2 candidates remain INSTALL_NOT_RUN / SMOKE_TEST_NOT_RUN by MP.
 
-4. Air 3S:
+5. Air 3S:
    no actual Air 3S video/log compatibility test has been run in M1.
 
-5. Quality:
+6. Quality:
    no accepted threshold exists.
 
-6. Merger:
+7. Merger:
    CandidateEvent semantics are a discovered integration gap; no custom implementation is authorized.
 
-7. Licensing:
+8. Licensing:
    several reference implementations have no clear repository license.
    They remain LEARN references only.
 
-8. Reconnaissance coverage:
+9. Reconnaissance coverage:
    targeted and sufficient for current decisions, not an exhaustive literature/commercial-product survey.
 
-9. GitHub enforcement:
+10. GitHub enforcement:
    Research Gate technical repair was accepted, but GitHub Actions run/required merge enforcement remains a separate known limitation.
 
 ## Recommended reviewer decision surface

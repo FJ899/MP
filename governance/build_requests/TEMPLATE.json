@@ -1,0 +1,11 @@
+{
+  "change_id": "MP-CR-XXX",
+  "description": "Implementation change being authorized.",
+  "scope": [
+    "components/example/**"
+  ],
+  "research_record": "research/records/example.json",
+  "authorized_decision": "ADAPT",
+  "review_status": "PENDING",
+  "human_decision": "PENDING"
+}

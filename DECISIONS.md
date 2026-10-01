@@ -48,3 +48,9 @@ Human decision: detector selection must be informed by task-relevant benchmarks/
 ## Working hypothesis — VLM authority
 Source-derived hypothesis to test, not yet a frozen human decision:
 use the detector/anomaly model as the source of detection verdict and treat VLM output as interpretation/explanation unless MP evidence later justifies a stronger role.
+
+## D-013 — Two search rhythms
+Human decision:
+- targeted search is mandatory before designing each major component,
+- broad ecosystem scan is periodic only, normally weekly or biweekly when useful,
+- do not run a daily broad "AI drone repo" search that creates noise without a decision hinge.

@@ -79,3 +79,22 @@ MODEL_ARTIFACT_PROVENANCE_AND_TERMS_UNRESOLVED.
 M1 does not independently establish whether the root Apache-2.0 terms cover or exclude these bundled model/data artifacts.
 
 M2-02 must not use the default model until this boundary is resolved or a custom model with acceptable pinned provenance/terms is supplied.
+
+
+## BRISQUE bundled model artifacts
+
+Repository: rehanguha/brisque
+
+Pinned code commit: 42c854ef9278f09d047abb8600d5204f779eca52
+
+Default runtime artifacts loaded by BRISQUE.__init__():
+- brisque/models/svm.txt — git blob 19237f04eae11398a2a41b91a7ef8ad2bfc084d5
+- brisque/models/normalize.pickle — git blob 18ed3adf6991d0feba7b3cb832a247209f9f5cf1
+
+Both artifacts first appear in repository history in commit 10e2dd2a23ee597e788761b161bec1c60aa046fd ("Made a package out of the code and added the models.").
+
+Status: MODEL_ARTIFACT_PROVENANCE_AND_TERMS_UNRESOLVED.
+
+M1 does not independently establish whether the root Apache-2.0 terms cover or exclude these bundled model/data artifacts.
+
+M2-02 must not use the default model until this boundary is resolved or a custom model with acceptable pinned provenance/terms is supplied.

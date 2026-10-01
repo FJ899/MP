@@ -56,7 +56,38 @@ It proves the metric family is not novel, but unclear licensing and older depend
 
 repository: rehanguha/brisque
 pinned_commit: 42c854ef9278f09d047abb8600d5204f779eca52
-license: Apache-2.0
+
+Code license:
+Apache-2.0.
+
+Bundled default model artifacts:
+- brisque/models/svm.txt
+  - git blob: 19237f04eae11398a2a41b91a7ef8ad2bfc084d5
+- brisque/models/normalize.pickle
+  - git blob: 18ed3adf6991d0feba7b3cb832a247209f9f5cf1
+
+Source behavior:
+BRISQUE.__init__() uses these artifacts by default:
+- svm_load_model(svm.txt)
+- pickle.load(normalize.pickle)
+
+The constructor also accepts a custom model_path with separate SVM and normalization artifacts.
+
+Artifact history:
+both default model files first appear in repository history in commit
+10e2dd2a23ee597e788761b161bec1c60aa046fd
+("Made a package out of the code and added the models.")
+
+Model-artifact provenance/license status:
+UNRESOLVED.
+
+M1 does not establish:
+- where the bundled SVM model was trained,
+- what dataset/quality labels produced it,
+- the independent origin of normalize.pickle,
+- whether the repository Apache-2.0 terms are intended to cover these bundled model/data artifacts.
+
+M1 also does not claim that Apache-2.0 excludes them.
 
 Input:
 image ndarray or URL.
@@ -76,6 +107,13 @@ THIN: image/frame -> numeric quality observation + provenance.
 MP assessment:
 EVALUATE in M2 as one quality signal, not as the complete gate.
 
+Execution precondition:
+Before M2-02 uses the default BRISQUE model, either:
+1. resolve the provenance/terms applicable to svm.txt + normalize.pickle, or
+2. use a custom BRISQUE model whose model/data provenance and terms are explicitly pinned and acceptable.
+
+No training is authorized by this condition.
+
 ## Critical boundary
 
 BRISQUE is not itself a defect detector and a high/low score is not automatically a RECHECK decision.
@@ -90,7 +128,7 @@ Thresholds need MP footage and human-inspection relevance.
 ## M1 proposed disposition
 
 LEARN from IIQC architecture.
-EVALUATE Apache-2.0 BRISQUE plus simple measurable blur/exposure signals in M2.
+EVALUATE BRISQUE code (Apache-2.0) plus simple measurable blur/exposure signals in M2, subject to the separate model-artifact precondition above.
 Do not adopt IIQC as a runtime dependency yet.
 
 REPLACES WHAT?:

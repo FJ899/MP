@@ -76,3 +76,44 @@ Classify any finding as:
 - PROCESS OVERHEAD suggestion.
 
 Do not treat the absence of current branch protection as a code defect in the policy. It is an explicit owner-configuration gap.
+
+
+## Repair review after MP/review-001/AI-B
+
+Review the repaired candidate specifically against:
+
+### MP-R01
+Expected:
+- main.py => protected
+- tools/new_detector.py => protected
+- governance/evil.py => protected
+- unknown non-document artifact => fail closed unless explicitly classified/exempted.
+
+### MP-R02
+Expected:
+- historical Build Request not changed in current diff cannot authorize a new protected file,
+- authorized_files are exact paths, not globs,
+- component_id must match Research Record,
+- Research Record contents are pinned by SHA-256,
+- authorization records decision_id/source/state_version/subject_version,
+- NARROW_REPAIR may reuse Research Record but requires a current per-change Build Request.
+
+### MP-R03
+Expected CODEOWNERS:
+- /scripts/check_research_gate.py @FJ899
+- /tests/test_research_gate.py @FJ899
+- /.github/CODEOWNERS @FJ899
+plus existing governance/workflow/records coverage.
+
+### MP-R04
+Expected validation:
+- YYYY-MM-DD placeholder rejected,
+- invalid calendar date rejected,
+- blank query rejected,
+- invalid integration_role rejected,
+- DONE with no candidates rejected,
+- NO_RESULT with candidates rejected.
+
+### Separation
+Do not interpret Research Gate PASS as M1 DONE.
+M1 remains OPEN and Architecture v0.1 remains NOT_READY.

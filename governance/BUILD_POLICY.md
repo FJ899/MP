@@ -177,10 +177,34 @@ The automated gate uses two layers:
 2. fail-closed unknown locations:
    executable/code files such as Python, JS/TS, Go, Rust, Java, C/C++, shell, PowerShell, notebooks, SQL and proto are protected even when placed outside the expected layout.
 
+3. functional manifest precedence:
+   dependency/runtime manifests are protected BEFORE any generic documentation/data-directory exemption, regardless of location.
+
+   Examples that remain protected:
+   - experiments/requirements.txt
+   - docs/package.json
+   - governance/docker-compose.yml
+   - research/environment.yml
+
+4. contract-draft exemption is format-limited:
+   only explicit design/data draft formats under contracts/ are exempt:
+   - *.draft.json
+   - *.draft.yaml
+   - *.draft.yml
+   - *.draft.md
+
+   Executable code remains protected even when its filename contains ".draft.", e.g.:
+   - contracts/adapter.draft.py
+
 Therefore:
 - `main.py` is protected,
 - `tools/new_detector.py` is protected,
-- moving code outside `components/` does not bypass the gate.
+- `experiments/requirements.txt` is protected,
+- `docs/package.json` is protected,
+- `governance/docker-compose.yml` is protected,
+- `research/environment.yml` is protected,
+- `contracts/adapter.draft.py` is protected,
+- moving code/manifests outside `components/` does not bypass the gate.
 
 Narrow explicit exemptions exist only for governance/research/documentation artifacts needed to operate this policy.
 
@@ -241,6 +265,9 @@ GitHub Actions runs:
 The regression suite must include at least:
 - unknown root code path blocked,
 - unknown nested code path blocked,
+- dependency/runtime manifests protected outside canonical layout,
+- executable *.draft.* contract code protected,
+- explicit design-data draft contract remains exempt,
 - stale historical Build Request cannot authorize a new protected file,
 - narrow repair can reuse accepted Research Record with a fresh per-change Build Request,
 - invalid ISO date rejected,

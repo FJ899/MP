@@ -160,3 +160,22 @@ Preserved limitations:
 
 Next approved project activity:
 continue unfinished M1 Technology Reconnaissance.
+
+
+## Pending M1 artifact decision
+
+Current candidate:
+M1_RESULT.md
+
+status:
+READY_FOR_INDEPENDENT_REVIEW
+
+Important:
+The dispositions EVALUATE / LEARN / PARK in M1_RESULT.md and REPO_RADAR.md are AI-A proposals for review, not HUMAN decisions.
+
+No USE / ADAPT / BUILD decision has been promoted from this M1 work.
+
+Next decision sequence:
+AI-B independent review
+→ HUMAN M1 artifact decision
+→ only then any separately scoped M2 execution authorization.

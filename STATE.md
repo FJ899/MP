@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 11
+state_version: 12
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_01_proposal_ready, state_version, next_action
+changed_fields: M2_01_proposal_revision_2, M2_01_status_semantics, frame_identity_procedure, state_version, next_action
 
 ## Approved goal
 
@@ -72,7 +72,7 @@ MP Architecture v0.1:
 NOT READY TO FREEZE / NOT AUTHORIZED TO FREEZE
 
 M2_01:
-PROPOSAL_READY_FOR_HUMAN_DECISION
+PROPOSAL_REVISION_2_READY_FOR_HUMAN_DECISION
 
 M2_execution:
 NOT AUTHORIZED
@@ -107,7 +107,7 @@ proposal_artifact:
 M2_01_EXECUTION_PROPOSAL.md
 
 proposal_status:
-PENDING HUMAN DECISION
+REVISION_2 / PENDING HUMAN DECISION
 
 ## M2-01 input availability
 
@@ -122,7 +122,7 @@ NO NATIVE AIR 3S MP4 FOUND.
 Search returned documentation/reports but no relevant video artifact.
 
 input_status:
-MISSING / BLOCKS AIR 3S COMPATIBILITY EXECUTION.
+NOT_STARTED / BLOCKED_BY_INPUT.
 
 Substitute video:
 may test generic procedure only;
@@ -168,9 +168,33 @@ NOT REQUIRED.
 - M2 runtime evidence: NOT_RUN.
 - MP end-to-end: NOT_BUILT / NOT_RUN.
 
+## M2-01 proposal review
+
+review_packet:
+MP/m2-01-proposal-review-001/AI-B
+
+review_result:
+PROPOSAL_DIRECTION_ACCEPTED / REVISION_REQUIRED
+
+revision_completed:
+YES
+
+proposal_revision:
+2
+
+Key corrections recorded:
+- 10/30/50/70/90% targets are derived from the observed selected-stream timestamp range T_min..T_max, not from zero;
+- raw PTS and best_effort_timestamp remain distinct;
+- both enumeration_ordinal and presentation_ordinal are preserved;
+- exact extraction uses decoded-frame ordinal selection, not approximate seek;
+- source/frame identity, decoded-pixel equality and PNG-byte equality are evaluated separately;
+- current pre-execution state is NOT_STARTED / BLOCKED_BY_INPUT, not INCONCLUSIVE.
+
+No experiment command was executed as part of this revision.
+
 ## Next action
 
-HUMAN reviews M2_01_EXECUTION_PROPOSAL.md and returns one of:
+HUMAN reviews M2_01_EXECUTION_PROPOSAL.md revision 2 and returns one of:
 - AUTHORIZE_M2_01
 - ACCEPT_PLAN_ONLY
 - REQUEST_CHANGES

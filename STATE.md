@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 6
+state_version: 7
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT
-changed_fields: second_repair_cycle, MP-R01_classification, regression_tests, state_version, next_action
+changed_fields: human_artifact_acceptance, accepted_decisions, research_gate_status, state_version, next_action
 
 ## Approved goal
 Sprawdzić, czy z istniejących narzędzi można złożyć minimalne laboratorium, które przyjmuje materiał z lotu inspekcyjnego, analizuje go kilkoma komplementarnymi metodami, łączy wyniki i przekazuje operatorowi ograniczoną listę miejsc CONFIRM / REJECT / RECHECK.
@@ -172,3 +172,60 @@ Final AI-B repair review for MP-R01.
 If another blocking/major Research Gate defect remains after this second repair-review cycle, do not enter a third automatic repair loop. Escalate a BLOCKER_DECISION to HUMAN under TWO-WEBAI limits.
 
 M1 Technology Reconnaissance remains a separate OPEN activity.
+
+
+## Human Artifact Decision — Research Gate
+
+decision_id:
+HUMAN-ARTIFACT-DECISION-RG-001
+
+source:
+HUMAN_EXPLICIT_ACCEPT
+
+accepted_subject_version:
+f799d26184504ae890b3a8ab064ad29de9267cbd
+
+artifact_decision:
+ACCEPT
+
+acceptance_scope:
+Techniczna naprawa Research Gate MP-R01–MP-R04.
+
+accepted_review:
+MP/review-003/AI-B
+
+accepted_review_verdict:
+PASS
+
+research_gate_repair_status:
+TECHNICALLY_ACCEPTED_IN_REVIEWED_SCOPE
+
+explicit_non_authorizations:
+- merge_to_main remains NOT AUTHORIZED
+- build_orchestrator remains NOT AUTHORIZED
+- product implementation remains NOT AUTHORIZED
+- publish remains NOT AUTHORIZED
+- release remains NOT AUTHORIZED
+- deploy remains NOT AUTHORIZED
+- M1 closure remains NOT AUTHORIZED
+- MP Architecture v0.1 freeze remains NOT AUTHORIZED
+
+known_limitations_preserved:
+- GitHub Actions run for accepted candidate: NOT_OBSERVED
+- hard merge enforcement: NOT_VERIFIED
+- classic branch protection: UNAVAILABLE through connector
+- authenticity of recorded human authorization fields still depends on process/review, not cryptographic proof
+- NARROW_REPAIR classification remains a review judgment
+- Research Gate does not prove code conforms semantically to an accepted solution
+
+M1 status:
+OPEN
+
+MP Architecture v0.1:
+NOT READY TO FREEZE
+
+## Next action after acceptance
+Resume M1 Technology Reconnaissance.
+
+Priority:
+complete the still-open VERTICAL/HORIZONTAL searches and source audits needed to decide which existing solutions should be USE / ADAPT / LEARN / REJECT / PARK before MP Architecture v0.1 can be frozen.

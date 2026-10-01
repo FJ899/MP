@@ -3,8 +3,14 @@
 status:
 HUMAN_DECISION_REQUIRED
 
+proposal_revision:
+2
+
 experiment_id:
 M2-01
+
+execution_status:
+NOT_STARTED / BLOCKED_BY_INPUT
 
 execution_authorization:
 NOT_GRANTED
@@ -20,12 +26,14 @@ NOT_AUTHORIZED
 
 ## Decision purpose
 
-Determine whether a native DJI Air 3S MP4 can be mapped reproducibly from:
+Determine whether one native DJI Air 3S MP4 can be mapped reproducibly from:
 
 source file
-→ video stream/timebase
-→ presentation timestamps
-→ selected frame identity
+→ exact video stream
+→ decoded-frame enumeration
+→ presentation timestamp identity
+→ selected decoded pixels
+→ human-reviewable evidence
 
 so a later CandidateEvent can point back to evidence a human can RECHECK.
 
@@ -40,17 +48,18 @@ This experiment intentionally does NOT test:
 - route planning,
 - orchestrator integration.
 
-## Why M2-01 is first
+## Current status before execution
 
-All later visual findings need durable source provenance.
+Required native Air 3S input:
+MISSING.
 
-If MP cannot reliably say:
+Therefore current experiment status is:
 
-"this observation came from this source video at this presentation time / frame position"
+NOT_STARTED / BLOCKED_BY_INPUT.
 
-then anomaly scores, masks and CandidateEvents cannot form auditable RECHECK evidence.
+INCONCLUSIVE is reserved for an experiment that was actually started but could not produce a decisive PASS or FAIL.
 
-M2-01 therefore tests provenance plumbing before model quality.
+No M2 command has been executed under this proposal.
 
 ## Required input
 
@@ -60,96 +69,102 @@ One native, unedited DJI Air 3S MP4:
 - no social-media/export/transcode copy,
 - retain original filename and metadata.
 
-Input availability observed during proposal preparation:
-
 Repository FJ899/MP:
 NO video file found.
 
-Conversation + Library search:
+Conversation + Library search performed during proposal preparation:
 NO native Air 3S MP4 found.
-Search returned documents/reports rather than a relevant video artifact.
-
-INPUT_STATUS:
-MISSING.
-
-Consequence:
-Air 3S compatibility cannot be tested until a native clip is supplied.
 
 A substitute MP4 may validate the generic measurement procedure only.
 It must be labeled GENERIC_PROCEDURE_ONLY and cannot establish Air 3S compatibility.
 
-## Available execution environment
+## Available environment — previously observed, not execution authorization
 
-Observed without installation:
+Observed during proposal preparation:
 
-### FFmpeg
-
-binary version:
+ffmpeg:
 7.1.5-0+deb13u1
 
-build:
-Debian package; reports --enable-gpl.
-
-Use in experiment:
-decode selected video stream and extract deterministic selected frames.
-
-Important identity boundary:
-this installed binary is not assumed byte/source-identical to the FFmpeg commit pinned during M1 reconnaissance.
-
-The experiment evidence must record the actual binary version/configuration used.
-
-### FFprobe
-
-version:
+ffprobe:
 7.1.5-0+deb13u1
 
-Use:
-stream metadata and per-frame timestamp/PTS inspection.
-
-### Python
-
-version:
+python:
 3.13.5
 
-Use:
-not required for the minimal CLI experiment.
-May be used only if HUMAN later authorizes a small evidence-comparison helper.
-
-### OpenCV
-
-version:
+OpenCV:
 4.13.0
 
-Use:
-available, but OPTIONAL.
-M2-01 does not need OpenCV in the minimal path.
+GPU:
+NOT REQUIRED.
 
-### GPU
+Minimal proposed path:
+FFprobe + FFmpeg + standard file hashing.
 
-not required.
+Additional installation:
+NONE expected.
 
-## Installation plan
+Important:
+tool versions must be re-recorded in the experiment evidence at actual execution time.
+The installed binary is not assumed source-identical to the FFmpeg commit pinned during M1.
 
-None.
-
-The minimal proposed execution uses already available:
-- ffprobe,
-- ffmpeg,
-- standard shell hashing/comparison utilities.
-
-If the authorized environment changes before execution, record the new exact tool identities before running.
-
-## Experiment scope
+## Scope
 
 One source file.
-One video stream.
-Two repeated measurement/extraction runs.
+One explicitly selected video stream.
+Two repeated probe runs.
+Two repeated extraction runs for five selected frames.
 
-No repository implementation code is required.
+No repository implementation code.
+No dependency installation.
+No adapter.
+No model.
+No approximate seek-based extraction.
 
-No dependency manifest change is required.
+## Terminology
 
-No adapter is created.
+### raw PTS
+
+The frame field reported by ffprobe as:
+pts
+
+and converted using the selected stream time_base.
+
+raw PTS is preserved separately.
+
+### best-effort timestamp
+
+The ffprobe field:
+best_effort_timestamp
+
+It is a decoder-derived estimated timestamp and must NEVER be labeled as original/raw PTS.
+
+### selection timestamp kind
+
+One basis is chosen for the whole frame-selection calculation:
+
+RAW_PTS
+
+or, only if raw PTS is not usable across the required frame set:
+
+BEST_EFFORT_TIMESTAMP.
+
+Do not mix timestamp kinds silently within one selection calculation.
+
+### enumeration_ordinal
+
+Zero-based ordinal in the decoded frame sequence emitted by the same FFmpeg decoding path represented by ffprobe -show_frames.
+
+This ordinal is retained because FFmpeg select=n uses decoded-frame sequence order.
+
+### presentation_ordinal
+
+Zero-based ordinal after ordering the frame records by:
+
+1. selected presentation timestamp ascending;
+2. enumeration_ordinal ascending as the deterministic tie-breaker.
+
+This is a derived evidence field.
+It is not interchangeable with raw PTS.
 
 ## Step 0 — Input identity
 
@@ -158,194 +173,339 @@ Record:
 - original filename,
 - file size,
 - SHA-256 of complete input file,
-- acquisition/source note: native Air 3S original vs substitute,
-- experiment date,
-- experiment ID.
+- source note: native Air 3S original vs substitute,
+- experiment ID,
+- execution date.
 
-Do not commit the source video to Git solely for this experiment unless HUMAN explicitly requests it.
+Do not automatically commit the full source video.
 
-The evidence package can bind to the video by SHA-256.
+## Step 1 — Runtime identity
 
-## Step 1 — Record tool identity
+Persist exact output of:
 
-Persist:
+    ffmpeg -version
+    ffprobe -version
 
-- ffmpeg -version output,
-- ffprobe -version output,
-- exact command lines,
-- operating environment note.
+Also record:
+- operating environment,
+- complete commands actually executed.
 
-This distinguishes:
-source-inspection evidence from the exact runtime binary used.
+## Step 2 — Discover streams and select exactly one video stream
 
-## Step 2 — Probe stream metadata
+Proposed command:
 
-Use ffprobe to record at minimum:
+    ffprobe -v error       -show_entries stream=index,codec_type,codec_name,width,height,time_base,r_frame_rate,avg_frame_rate,start_time,duration,nb_frames:format=start_time,duration:stream_tags       -of json       "$INPUT"       > stream_metadata.json
 
-- video stream index,
-- codec name,
+Selection rule:
+
+- enumerate all streams first;
+- select exactly one intended video stream;
+- store its GLOBAL stream index as STREAM_INDEX;
+- all later commands explicitly target that stream.
+
+Do not assume the desired video stream is stream 0.
+
+Record:
+- STREAM_INDEX,
+- codec,
 - width/height,
 - time_base,
-- r_frame_rate,
-- avg_frame_rate,
-- start_time,
-- duration,
-- frame count if reported,
-- format duration,
-- metadata/tags relevant to source identity.
+- rates,
+- stream start_time/duration when present,
+- container start_time/duration separately.
 
-Proposed output:
+## Step 3 — Enumerate decoded frames twice
 
-evidence/m2-01/<experiment-id>/stream_metadata.json
+For the chosen global stream index:
 
-## Step 3 — Probe frame presentation timestamps twice
+Run 1:
 
-Run the same ffprobe frame enumeration twice.
+    ffprobe -v error       -select_streams "$STREAM_INDEX"       -show_frames       -show_entries frame=stream_index,pts,pts_time,best_effort_timestamp,best_effort_timestamp_time,pkt_dts,pkt_dts_time,pict_type,width,height       -of json       "$INPUT"       > frames_run1.json
 
-Record for the selected video stream at minimum:
+Run 2:
 
-- ordinal/decode listing position,
+    ffprobe -v error       -select_streams "$STREAM_INDEX"       -show_frames       -show_entries frame=stream_index,pts,pts_time,best_effort_timestamp,best_effort_timestamp_time,pkt_dts,pkt_dts_time,pict_type,width,height       -of json       "$INPUT"       > frames_run2.json
+
+For every decoded frame derive/store:
+
+- stream_index,
+- enumeration_ordinal,
+- raw pts,
+- raw pts_time,
+- stream time_base,
 - best_effort_timestamp,
 - best_effort_timestamp_time,
-- pkt_dts when available,
-- pkt_dts_time when available,
-- picture type where useful.
+- pkt_dts / pkt_dts_time when available,
+- pict_type,
+- dimensions.
 
-Outputs:
+Never replace a missing raw PTS field with best_effort_timestamp under the same column/name.
 
-frames_run1.csv
-frames_run2.csv
+## Step 4 — Choose one timestamp basis for sample selection
 
-Purpose:
-test whether repeated probing yields the same presentation-time mapping.
+Selection-basis rule:
 
-## Step 4 — Choose deterministic sample positions
+A. If raw pts/pts_time is present and usable for the frame population required by the experiment:
+   selection_timestamp_kind = RAW_PTS.
 
-Select five interior sample points based on the observed duration:
+B. Otherwise, if best_effort_timestamp is present and usable:
+   selection_timestamp_kind = BEST_EFFORT_TIMESTAMP.
 
-- approximately 10%
-- approximately 30%
-- approximately 50%
-- approximately 70%
-- approximately 90%
+C. If neither provides a usable presentation-time basis:
+   after an authorized run, result is INCONCLUSIVE unless the observed behavior itself satisfies a defined FAIL condition.
 
-For each point:
-choose the nearest frame by presentation timestamp from the recorded frame list.
+The selected kind is written into:
+selected_samples.csv
+
+and applies consistently to all five target samples.
+
+## Step 5 — Derive actual timestamp range
+
+Do NOT assume the video presentation timeline starts at zero.
+
+For the chosen selection timestamp kind:
+
+    T_min = minimum selected-stream frame timestamp_time
+    T_max = maximum selected-stream frame timestamp_time
+
+Require:
+
+    T_max > T_min
+
+The sample target for percentage p is:
+
+    target(p) = T_min + p * (T_max - T_min)
+
+for:
+
+    p = 0.10
+    p = 0.30
+    p = 0.50
+    p = 0.70
+    p = 0.90
+
+Thus 10/30/50/70/90% are relative to the observed frame timestamp range, not to zero and not blindly to container duration.
+
+## Step 6 — Deterministic nearest-frame rule
+
+For each target(p), choose the frame minimizing:
+
+    abs(frame_selection_timestamp_time - target(p))
+
+Tie-breaking:
+
+1. choose the LOWER frame_selection_timestamp_time;
+2. if multiple frames still have the same selected timestamp, choose the LOWER presentation_ordinal;
+3. if needed for exact extraction bookkeeping, retain that frame's enumeration_ordinal.
+
+For every selected sample retain:
+
+- sample ID,
+- percentage p,
+- target timestamp time,
+- timestamp kind used,
+- stream index,
+- enumeration_ordinal,
+- presentation_ordinal,
+- raw PTS,
+- raw pts_time,
+- stream time_base,
+- best_effort_timestamp,
+- best_effort_timestamp_time,
+- DTS fields when available.
+
+## Step 7 — Exact frame extraction from enumeration
+
+Approximate seek is NOT used.
+
+Prohibited as the identity mechanism:
+
+    ffmpeg -ss <approximate-time> ...
+
+because that alone does not prove extraction of the exact enumerated frame.
+
+The extraction key is the selected frame's:
+enumeration_ordinal.
+
+For one selected sample with:
+
+    N=<enumeration_ordinal>
+    STREAM_INDEX=<global stream index>
+
+proposed extraction command:
+
+    ffmpeg -hide_banner -loglevel info       -copyts       -i "$INPUT"       -map 0:"$STREAM_INDEX"       -vf "select='eq(n\,$N)',showinfo"       -fps_mode passthrough       -frames:v 1       -an -sn -dn       -c:v png       "$OUT_PNG"       2> "$OUT_LOG"
+
+Repeat the same command structure for all five samples.
+
+Then repeat the full five-frame extraction as independent Run B.
+
+Why these options are explicit:
+
+- -map 0:STREAM_INDEX chooses the exact source stream;
+- select=eq(n,N) chooses one exact decoded-frame ordinal, not an approximate seek time;
+- -fps_mode passthrough avoids intentional CFR duplication/drop behavior;
+- -frames:v 1 limits output to the selected frame;
+- -copyts avoids deliberately rebasing timestamps to zero;
+- showinfo records the selected decoded frame's runtime PTS/time evidence.
+
+The showinfo record must be compared with the selected frame record.
+Any mismatch is evidence, not something to normalize away.
+
+## Step 8 — Decoded-pixel hash
+
+PNG file bytes are not the primary pixel-identity proof.
+
+For the same selected frame, calculate a hash of a standardized decoded pixel representation.
+
+Proposed command:
+
+    ffmpeg -v error       -copyts       -i "$INPUT"       -map 0:"$STREAM_INDEX"       -vf "select='eq(n\,$N)',format=rgb24"       -fps_mode passthrough       -frames:v 1       -an -sn -dn       -f hash       -hash sha256       -
+
+Record the returned SHA-256 as:
+
+decoded_rgb24_sha256
+
+for Run A and Run B.
+
+This tests decoded pixel equality independently of PNG container/encoder bytes.
+
+## Step 9 — PNG file hash
+
+Also compute:
+
+    sha256sum "$OUT_PNG"
 
 Record:
 
-- sample ID,
-- frame ordinal/index used by the experiment,
-- PTS,
-- PTS time,
-- target percentage/time.
+png_file_sha256
 
-Do not freeze a production sampling cadence.
+This is a secondary reproducibility measure.
 
-These five points exist only to test reproducibility.
+Different PNG SHA-256 values do NOT automatically mean different decoded pixels.
 
-## Step 5 — Extract selected frames twice
+## Step 10 — Three separate comparisons
 
-Using the same ffmpeg binary and identical parameters:
+### A. Source → stream → frame → timestamp identity
 
-Run A:
-extract the five selected frames.
+Compare Run A / Run B:
 
-Run B:
-repeat extraction independently.
+- input SHA-256,
+- exact STREAM_INDEX,
+- frame counts relevant to enumeration,
+- enumeration_ordinal,
+- presentation_ordinal,
+- raw PTS,
+- pts_time,
+- time_base,
+- best-effort fields,
+- timestamp kind used,
+- selected target mapping,
+- showinfo PTS/time for extracted frame.
 
-For every extracted image record:
+This is the primary provenance test.
 
-- sample ID,
-- source frame/PTS mapping,
-- image dimensions,
-- output filename,
-- SHA-256.
-
-Expected:
-the same sample selected under the same source and parameters produces byte-identical extracted evidence, or any non-identical behavior is explicitly explained and investigated.
-
-Preferred lossless output:
-PNG.
-
-## Step 6 — Compare run evidence
+### B. Decoded-pixel equality
 
 Compare:
 
-### Frame timestamp table
-run1 vs run2:
-- same number/order of observed frames relevant to the experiment,
-- same best-effort PTS values,
-- same best-effort PTS times.
+decoded_rgb24_sha256
 
-### Selected frames
-run1 vs run2:
-- same selected source positions,
-- same dimensions,
-- same output SHA-256.
+for each corresponding sample.
 
-### Ordering
-presentation timestamps must not move backwards.
+Matching hashes mean the standardized decoded pixels are identical for that sample under the compared runs.
 
-Any duplicates or irregular timing must be preserved as evidence rather than silently normalized away.
+### C. PNG byte equality
+
+Compare:
+
+png_file_sha256.
+
+Interpretation:
+
+- A same + B same + C same:
+  strongest reproducibility observation.
+
+- A same + B same + C different:
+  do NOT claim a different source frame;
+  investigate PNG encoding/metadata/output-byte differences.
+
+- A same + B different:
+  decoded-pixel reproducibility problem requiring diagnosis.
+
+- A different:
+  source/frame/timestamp mapping reproducibility problem regardless of PNG hash.
 
 ## PASS criteria
 
-PASS requires all of the following for a native Air 3S input:
+PASS for one native Air 3S input requires:
 
-1. input SHA-256 is recorded;
-2. the intended video stream is unambiguously identified;
-3. stream time_base is available;
-4. frame-level presentation timestamps are available for the selected stream;
-5. repeated ffprobe runs produce the same relevant timestamp mapping;
-6. selected presentation timestamps are monotonic/non-reversing;
-7. the five deterministic sample positions map to the same frames/PTS on both runs;
-8. repeated extraction with identical parameters produces matching image dimensions and SHA-256 for each sample;
-9. every extracted frame can be traced back to:
-   source SHA-256 + stream + frame/PTS + extraction parameters;
-10. no unexplained timestamp reorder/corruption undermines RECHECK provenance.
+1. input SHA-256 recorded;
+2. one intended video stream explicitly selected by global stream index;
+3. stream time_base recorded;
+4. raw PTS and best-effort fields preserved separately;
+5. the selected timestamp kind explicitly recorded;
+6. T_min/T_max derived from actual selected-stream frame timestamps, not assumed zero;
+7. both probe runs reproduce the relevant source→stream→frame→timestamp mapping;
+8. selected presentation timestamps do not reverse after applying the declared presentation ordering;
+9. all five target percentages choose the same frame identities in both probe runs;
+10. exact extraction by enumeration_ordinal yields showinfo evidence consistent with the selected frame;
+11. Run A and Run B decoded_rgb24_sha256 match for all five samples;
+12. any PNG-byte mismatch with matching decoded pixels is separately diagnosed and does not by itself fail frame identity;
+13. every sample is traceable to:
+    input SHA-256
+    + stream index
+    + enumeration ordinal
+    + presentation ordinal
+    + raw PTS if present
+    + time_base
+    + declared timestamp kind
+    + extraction command.
 
-PASS means:
-the tested Air 3S clip supports a reproducible source→time→frame evidence path in this environment.
+PASS means only:
 
-PASS does NOT mean:
-all Air 3S recording modes/codecs/firmware are compatible.
+for this exact native Air 3S file, selected stream, toolchain and recording profile, the tested source→timestamp→frame→pixel path is reproducible.
+
+PASS does NOT generalize to every Air 3S mode, firmware, codec profile or future tool version.
 
 ## FAIL criteria
 
-FAIL if any of the following occurs and cannot be explained as an experiment/configuration error:
+FAIL if an authorized run produces a repeatable defect that undermines auditable mapping, for example:
 
-- frame-level presentation timestamps cannot be obtained,
-- repeated probes produce materially different mappings,
-- presentation timestamps reverse unexpectedly,
-- the same selected source position maps to different frames across identical runs,
-- deterministic repeated extraction produces different image evidence for the same recorded source mapping,
-- the source cannot be decoded sufficiently to preserve auditable mapping.
+- repeated probe runs produce different frame/timestamp identities;
+- selected sample rules choose different frame identities across identical runs;
+- exact ordinal extraction does not correspond to the enumerated selected frame;
+- presentation identity reverses/corrupts in a way that cannot support RECHECK provenance;
+- identical mapped frame identity produces different decoded_rgb24_sha256 values without an explainable environment/input change;
+- the source cannot be decoded sufficiently to preserve auditable frame identity.
 
-FAIL does not automatically justify custom BUILD.
-It triggers diagnosis and comparison of existing alternatives/configuration.
+Different PNG file SHA alone is NOT sufficient for FAIL when decoded pixels match.
+
+FAIL does not authorize custom BUILD.
 
 ## INCONCLUSIVE criteria
 
-INCONCLUSIVE if:
+INCONCLUSIVE exists only after execution has started.
 
-- no native Air 3S clip is used,
-- the file is edited/transcoded and source provenance is uncertain,
-- the clip is corrupted/truncated,
-- required metadata is missing for reasons that cannot be separated from the supplied file,
-- environment identity changes between the two runs,
-- a test-procedure defect prevents a fair comparison.
+Examples:
 
-Most important current condition:
+- supplied file turns out to be edited/transcoded and native-source status cannot be established;
+- input is corrupted/truncated;
+- timestamp fields are insufficient but evidence cannot distinguish source peculiarity from procedure/tool configuration;
+- environment identity changed between repeated runs;
+- procedure defect invalidated the comparison.
 
-NO NATIVE AIR 3S INPUT
-→ M2-01 AIR 3S RESULT = INCONCLUSIVE / NOT_EXECUTABLE_AS_INTENDED.
+Current pre-execution condition is NOT INCONCLUSIVE.
+
+Current condition is:
+
+NOT_STARTED / BLOCKED_BY_INPUT.
 
 ## Evidence package
 
-Proposed location after authorization:
+After explicit authorization:
 
-evidence/m2-01/<experiment-id>/
+    evidence/m2-01/<experiment-id>/
 
 Proposed files:
 
@@ -355,45 +515,37 @@ Proposed files:
 - environment.txt
 - commands.txt
 - stream_metadata.json
-- frames_run1.csv
-- frames_run2.csv
+- frames_run1.json
+- frames_run2.json
 - selected_samples.csv
-- extracted/run1/*.png
-- extracted/run2/*.png
-- extracted_hashes_run1.txt
-- extracted_hashes_run2.txt
+- extracted/runA/*.png
+- extracted/runB/*.png
+- extraction_showinfo_runA/*.log
+- extraction_showinfo_runB/*.log
+- decoded_pixel_hashes_runA.txt
+- decoded_pixel_hashes_runB.txt
+- png_hashes_runA.txt
+- png_hashes_runB.txt
 - RESULT.md
 
-RESULT.md must state exactly one:
+RESULT.md after an executed attempt must state exactly one:
 
 PASS
 FAIL
 INCONCLUSIVE
 
-and list:
+and preserve:
 - actual input identity,
-- actual tools,
-- deviations from proposal,
-- observed anomalies,
+- actual runtime tool identity,
+- exact commands,
+- deviations,
+- anomalies,
 - limitations.
-
-## Evidence retention boundary
-
-Prefer committing compact evidence:
-- metadata,
-- commands,
-- hashes,
-- selected lossless sample frames if acceptable,
-- result summary.
-
-Do not automatically commit the full native Air 3S video because of size/privacy/provenance concerns.
-
-Input SHA-256 is sufficient to bind the experiment record to the retained source file.
 
 ## Cost
 
-Software/license cost for the proposed experiment:
-none expected from the already available toolchain.
+Additional software/license cost:
+none expected.
 
 Paid API:
 none.
@@ -407,67 +559,70 @@ none expected.
 Repository implementation:
 none.
 
-Primary resource cost:
-one short native Air 3S clip plus CPU/storage for probing and five lossless frame extracts.
+Primary resource:
+one short native Air 3S clip plus CPU/storage for complete frame probing and ten PNG extracts.
 
-## Risks / limitations
+## Preserved limitations
 
-1. One clip proves only the tested recording profile, not all Air 3S modes.
-2. FFmpeg installed binary is a Debian GPL-enabled build; this experiment records runtime identity but does not settle later product redistribution/licensing.
-3. Frame ordinal and presentation timestamp are distinct concepts; RECHECK provenance should prefer recorded presentation time/timebase rather than assuming frame_number/fps arithmetic is universally exact.
-4. Variable-frame-rate or unusual edit-list behavior may require adapting the evidence mapping while still using existing FFmpeg tooling.
-5. No telemetry is tested.
-6. No model/analyzer behavior is tested.
-7. A generic substitute video cannot validate Air 3S compatibility.
+1. One clip tests one recording profile only.
+2. Runtime FFmpeg package identity must be preserved; M1 source pin is not runtime identity.
+3. best_effort_timestamp is explicitly an estimated field and is not raw PTS.
+4. Frame ordinal, PTS, best-effort timestamp and timebase are separate evidence fields.
+5. Variable frame rate or timestamp irregularity is observed, not silently normalized.
+6. No telemetry is tested.
+7. No AI model is tested.
+8. Substitute video cannot validate Air 3S compatibility.
 
-## Proposed decision gate after M2-01
+## Decision after M2-01
 
 If PASS:
-propose a minimal reusable Observation source-provenance record and decide whether to continue to M2-02 or M2-03.
+propose the next smallest decision based on evidence.
+Do not automatically start M2-02.
 
 If FAIL:
-diagnose whether the cause is:
-- source-file peculiarity,
-- FFmpeg configuration,
-- timestamp semantics,
-- or need for another existing decoder/API.
-
-Do not BUILD custom ingestion before that comparison.
+diagnose existing tooling/configuration/source behavior before any custom BUILD.
 
 If INCONCLUSIVE:
-obtain a valid native Air 3S source and rerun only M2-01.
+fix only the unresolved experimental condition and rerun M2-01 if authorized.
 
 ## HUMAN decision options
 
 ### AUTHORIZE_M2_01
-Authorize execution of exactly this experiment after a native Air 3S clip is available.
 
-This authorization would permit:
+Authorize exactly this revised M2-01 after a native Air 3S clip is available.
+
+Permits:
 - probing one supplied native clip,
-- extracting five lossless sample frames twice,
-- creating the evidence package described above.
+- two frame enumerations,
+- selecting five frames using the declared T_min/T_max rule,
+- two exact ordinal-based extraction runs,
+- decoded-pixel hashes,
+- PNG hashes,
+- evidence package.
 
-It would NOT permit:
+Does NOT permit:
 - dependency installation,
-- repository implementation code,
-- M2-02 or later tests,
-- model execution/training,
-- architecture freeze,
-- merge.
+- repository implementation,
+- M2-02+,
+- AI model execution/training,
+- merge,
+- architecture freeze.
 
 ### ACCEPT_PLAN_ONLY
-Accept the experiment design but do not authorize execution.
+
+Accept revision 2 as the experiment design.
+Execution remains NOT_AUTHORIZED.
 
 ### REQUEST_CHANGES
-Return requested changes to this experiment design.
+
+Return specific plan changes.
 
 ### DEFER
+
 Keep M2-01 pending.
 
 ## Current recommendation
 
-Because the execution environment is already sufficient but the required native input is missing:
+The plan can be reviewed/accepted now.
 
-ACCEPT_PLAN_ONLY or AUTHORIZE_M2_01 conditional on supplying a native Air 3S clip are both operationally possible.
-
-Execution must not begin until explicit HUMAN authorization is recorded.
+Actual execution remains blocked by missing native Air 3S input and requires separate HUMAN authorization.

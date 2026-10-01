@@ -34,6 +34,11 @@ class GateClassificationTests(unittest.TestCase):
         self.assertTrue(gate.is_protected("tools/new_detector.py"))
         self.assertTrue(gate.is_protected("src/new_detector.py"))
         self.assertTrue(gate.is_protected("governance/evil.py"))
+        self.assertTrue(gate.is_protected("experiments/requirements.txt"))
+        self.assertTrue(gate.is_protected("docs/package.json"))
+        self.assertTrue(gate.is_protected("governance/docker-compose.yml"))
+        self.assertTrue(gate.is_protected("research/environment.yml"))
+        self.assertTrue(gate.is_protected("contracts/adapter.draft.py"))
         self.assertTrue(gate.is_protected("contracts/candidate_event.schema.json"))
 
     def test_documentation_and_explicit_draft_are_not_protected(self):
@@ -274,6 +279,19 @@ class GateEndToEndTests(unittest.TestCase):
         result = self.gate(self.base, head)
         self.assertEqual(result.returncode, 1)
         self.assertIn("main.py", result.stderr)
+
+    def test_manifest_outside_layout_requires_current_build_request(self):
+        manifest = self.root / "experiments" / "requirements.txt"
+        manifest.parent.mkdir(parents=True)
+        manifest.write_text("new-runtime-dependency==1.0\n", encoding="utf-8")
+        run("git", "add", "experiments/requirements.txt", cwd=self.root)
+        run("git", "commit", "-qm", "runtime manifest without request", cwd=self.root)
+        head = run("git", "rev-parse", "HEAD", cwd=self.root).stdout.strip()
+
+        result = self.gate(self.base, head)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("experiments/requirements.txt", result.stderr)
+        self.assertIn("no build request was added/modified", result.stderr)
 
     def test_glob_authorization_is_rejected(self):
         (self.root / "src" / "existing.py").write_text("print(11)\n", encoding="utf-8")

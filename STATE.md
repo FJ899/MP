@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 13
+state_version: 14
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_01_proposal_revision_3, enumeration_order_timestamp_integrity, saved_PNG_pixel_chain, state_version, next_action
+changed_fields: M2_01_human_authorization, M2_01_input_available, execution_status, state_version, next_action
 
 ## Approved goal
 
@@ -72,7 +72,7 @@ MP Architecture v0.1:
 NOT READY TO FREEZE / NOT AUTHORIZED TO FREEZE
 
 M2_01:
-PROPOSAL_REVISION_3_READY_FOR_REVIEW
+AUTHORIZED / INPUT_AVAILABLE / EXECUTION_PENDING
 
 M2_execution:
 NOT AUTHORIZED
@@ -107,7 +107,7 @@ proposal_artifact:
 M2_01_EXECUTION_PROPOSAL.md
 
 proposal_status:
-REVISION_3 / PENDING AI-B REVIEW
+REVISION_3 / REVIEWED PASS / HUMAN AUTHORIZED
 
 ## M2-01 input availability
 
@@ -122,7 +122,7 @@ NO NATIVE AIR 3S MP4 FOUND.
 Search returned documentation/reports but no relevant video artifact.
 
 input_status:
-NOT_STARTED / BLOCKED_BY_INPUT.
+AVAILABLE — Air3s_normal.MP4 supplied by HUMAN.
 
 Substitute video:
 may test generic procedure only;
@@ -197,18 +197,39 @@ New revision-3 corrections:
 
 No experiment command was executed as part of this revision.
 
+## M2-01 HUMAN authorization
+
+decision_id:
+HUMAN-M2-01-AUTH-001
+
+source:
+HUMAN_EXPLICIT_AUTHORIZE_M2_01
+
+authorized_subject_version:
+2b2926d8e0c91997913a30ff889725e0abdf54b7
+
+proposal_revision:
+3
+
+authorization_scope:
+exact M2-01 only.
+
+Explicitly not authorized:
+- M2-02 or later,
+- dependency installation,
+- model execution/training,
+- repository implementation,
+- merge,
+- architecture freeze,
+- flight/route execution,
+- publish/release/deploy.
+
 ## Next action
 
-AI-B reviews M2_01_EXECUTION_PROPOSAL.md revision 3.
+Execute exactly M2-01 revision 3 on the supplied native Air3s_normal.MP4.
 
-After proposal review PASS, HUMAN may return one of:
-- AUTHORIZE_M2_01
-- ACCEPT_PLAN_ONLY
-- REQUEST_CHANGES
-- DEFER
-
-Do not execute M2-01 until:
-1. HUMAN explicitly authorizes M2-01 execution, and
-2. a native Air 3S clip is available if the result is intended to establish Air 3S compatibility.
-
-No installation, extraction, decoding experiment or evidence generation is authorized by M1 acceptance alone.
+After execution:
+- record PASS / FAIL / INCONCLUSIVE,
+- preserve compact evidence,
+- submit result for independent review,
+- do not continue to M2-02 automatically.

@@ -72,6 +72,13 @@ GOVERNANCE_DATA_SUFFIXES = {
     ".tsv",
 }
 
+DRAFT_CONTRACT_SUFFIXES = {
+    ".json",
+    ".yaml",
+    ".yml",
+    ".md",
+}
+
 SAFE_METADATA_EXACT = {
     "README.md",
     "LICENSE",
@@ -198,20 +205,8 @@ def is_protected(path: str) -> bool:
     if path in EXEMPT_EXACT or path in SAFE_METADATA_EXACT:
         return False
 
-    if path.startswith(GOVERNANCE_DATA_PREFIXES):
-        if suffix in SAFE_NON_IMPLEMENTATION_SUFFIXES or suffix in GOVERNANCE_DATA_SUFFIXES:
-            return False
-        # Code/executable or unknown artifact under governance/research is
-        # intentionally NOT exempt; fall through to fail-closed protection.
-
-    if path.startswith("contracts/"):
-        return ".draft." not in name
-
-    if path.startswith(PROTECTED_PREFIXES):
-        if path.startswith("adapters/") and lower == "readme.md":
-            return False
-        return True
-
+    # Dependency/runtime manifests are protected by function, regardless of
+    # directory. They must be classified before documentation/data exemptions.
     if name in DEPENDENCY_EXACT:
         return True
     if lower.startswith("requirements") and lower.endswith(".txt"):
@@ -219,8 +214,27 @@ def is_protected(path: str) -> bool:
     if lower.startswith("dockerfile"):
         return True
 
+    # Contract drafts are exempt only when they are design/data artifacts in
+    # explicitly allowed formats. A file such as contracts/adapter.draft.py
+    # remains executable code and is protected.
+    if path.startswith("contracts/"):
+        is_design_draft = ".draft." in name and suffix in DRAFT_CONTRACT_SUFFIXES
+        return not is_design_draft
+
+    if path.startswith(PROTECTED_PREFIXES):
+        if path.startswith("adapters/") and lower == "readme.md":
+            return False
+        return True
+
+    # Executable/code content is protected before generic data-directory
+    # exemptions so code cannot hide under docs/, governance/, research/, etc.
     if suffix in EXECUTABLE_OR_CODE_SUFFIXES:
         return True
+
+    if path.startswith(GOVERNANCE_DATA_PREFIXES):
+        if suffix in SAFE_NON_IMPLEMENTATION_SUFFIXES or suffix in GOVERNANCE_DATA_SUFFIXES:
+            return False
+        # Unknown artifact under governance/research remains protected.
 
     if suffix in SAFE_NON_IMPLEMENTATION_SUFFIXES:
         return False

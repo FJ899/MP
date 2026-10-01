@@ -1,46 +1,81 @@
-# REPO RADAR
+# REPO RADAR — M1 Candidate Set
 
-Purpose: prevent MP from rebuilding solved problems without first inspecting existing implementations.
+Snapshot: 2026-10-01
 
-## Required fields
-Every serious candidate must record:
-NAME, URL, SEARCH TYPE, PROBLEM SOLVED, INPUT, OUTPUT, LICENSE, LAST ACTIVE, TESTS, DOCUMENTATION, GPU/CPU, MATURITY, INTEGRATION COST, WHAT WE CAN LEARN, REPLACES WHAT?, INTEGRATION ROLE, DECISION, WHY, EVIDENCE.
+Purpose:
+prevent MP from rebuilding solved problems before inspecting existing implementations.
 
-Source facts and MP assessments are separate. MATURITY and INTEGRATION COST below are working assessments unless execution evidence exists.
+Source facts and MP assessments are separate.
+No row below is HUMAN_ACCEPTED as an architecture choice.
 
-## Initial reconnaissance — 2026-10-01
+Detailed exact commit identities:
+see research/PINNED_SOURCES.md.
 
-| Name | Search | Problem solved | Input -> Output | License | Last active | Tests/evidence seen | MP maturity assessment | Integration cost | Replaces what? | Role | Decision | Why |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| IIQC | HORIZONTAL | rapid UAV inspection image-quality assessment + recollection feedback | UAV images + bridge/pose context -> quality assessment / recollection feedback | UNKNOWN; README License section is empty | 2023-11-15 | README reports simulation + real-world validation; MP has not executed it | research prototype | HIGH as direct component; MEDIUM as reference | custom quality-metric architecture | REFERENCE_IMPLEMENTATION | LEARN | Very close problem, but stack includes ROS, pose estimation, OctoMap, PCL and bridge-specific context; inspect algorithms before reuse |
-| Framework-for-UAV-image-quality | HORIZONTAL | computes quality metrics for UAV image folders | image folder -> flight quality metrics | UNKNOWN | NOT YET PINNED | README gives runnable workflow only | small utility / research code | LOW-MEDIUM | custom first-pass image quality metrics | COMPONENT candidate | EVALUATE | Simpler alternative to IIQC worth comparing before writing a quality gate |
-| AI-Visual-Inspector | HORIZONTAL | anomaly verdict + constrained VLM explanation | image -> anomaly score/heatmap/verdict -> explanation | LICENSE NOT FOUND at standard paths | 2026-09-11 | README reports real training and end-to-end runs; tests directory documented | working prototype with reported execution | MEDIUM | ad-hoc Anomalib+VLM fusion | REFERENCE_IMPLEMENTATION / COMPONENT candidate | LEARN / EVALUATE | Explicit authority split: detector decides, VLM explains and cannot override |
-| Hawk-I | VERTICAL | drone infrastructure inspection stack | camera/detections/GPS -> masks/verification/report/dashboard | MIT per README badge/license link | 2026-09-30 | README documents tests, verified environment, limitations; MP has not independently executed | integrated prototype | HIGH if reused wholesale; LOW-MEDIUM as reference | portions of detector->SAM->verification->report integration | REFERENCE_IMPLEMENTATION | LEARN | Very close whole-system architecture; useful competitor/reference, not target by default |
-| AegisInspect | VERTICAL | integrated infrastructure-inspection prototype with mapping, persistence, review and evidence discipline | detections/sensors -> persistent mapped findings/reports | LICENSE NOT FOUND at standard paths | 2026-09-30 | README records measured/demonstrated/frozen-pending states and provenance | mature research/capstone prototype | HIGH as dependency; LOW as reference | custom provenance, persistent IDs, observation aggregation patterns | REFERENCE_IMPLEMENTATION | LEARN | Strong reference for evidence boundaries, persistent defect identity and aggregation; avoid importing ROS/LiDAR scope |
-| WayPoint | HORIZONTAL | DJI Fly waypoint mission planning and KMZ export | planned waypoints/polygons -> DJI Fly KMZ | MIT | 2026-09-05 | runnable static application documented; MP has not tested Air 3S | active utility | MEDIUM | custom DJI KMZ generator | COMPONENT candidate | EVALUATE | README explicitly lists Air 3S and supports spacing, overlap, heading, gimbal, zoom, import/export |
-| DroneRoute | HORIZONTAL | DJI WPML/KMZ mission planner + controller upload | route/POI/actions -> WPML KMZ/controller mission slot | MIT per README | 2026-07-13 | CI badge + documented app/CLI; MP has not executed | active application | MEDIUM | custom WPML generator/controller transfer | COMPONENT / REFERENCE_IMPLEMENTATION | EVALUATE | Strong feature set, but README supported-drone list does NOT currently include Air 3S; compatibility must not be assumed |
-| drone-mission-planning | HORIZONTAL | research on DJI Fly mission format for Air 3S | DJI Fly dummy mission / model -> template.kml + waylines.wpml workflow | UNKNOWN | 2026-05-10 | file-format research says calibration awaits an Air 3S dummy mission | early research/prototype | LOW as reference | reverse-engineering DJI Fly WPML format | REFERENCE_IMPLEMENTATION | LEARN | Useful Air 3S-specific format research; explicitly not validated until calibrated on a real dummy mission |
-| BFD-UAV2K | HORIZONTAL / BENCHMARK | full-frame UAV facade defect detection benchmark | 2,000 UAV facade images -> benchmark detections/metrics | LICENSE PENDING per README | 2026-06-10 | benchmark results reported for YOLO/RT-DETR/Faster/Cascade R-CNN | benchmark release | LOW for comparison; license blocks use assumptions | "choose YOLO because familiar" | BENCHMARK | EVALUATE | Closest verified facade/UAV benchmark found; lets detector choice be evidence-led |
-| FBD Dataset + ensemble code | HORIZONTAL / BENCHMARK | facade defect image classification | close-range facade crops/images -> defect class | LICENSE NOT FOUND at standard paths | dataset 2025-09-24 | paper-linked code for ViT/Swin/ConvNeXt ensembles | research benchmark | MEDIUM | untested assumption that detection is the only useful supervised framing | BENCHMARK | PARK / LEARN | Useful classification evidence, but task differs from full-frame UAV detection and should not be conflated with BFD-UAV2K |
-| InsPLAD | HORIZONTAL / BENCHMARK | UAV asset detection + supervised/unsupervised fault analysis | 10,607 power-line UAV images -> asset/fault/anomaly benchmark | TO VERIFY | NOT YET PINNED | published dataset/benchmark documented | mature dataset/benchmark | LOW as benchmark | lack of real-UAV anomaly benchmark | BENCHMARK | LEARN | Different infrastructure domain, but strong evidence about UAV scale/viewpoint/clutter and anomaly workflows |
-| UAV crack benchmark (KangchengLiu) | HORIZONTAL / BENCHMARK | crack detection + segmentation dataset for UAV inspection | crack images -> detection/segmentation benchmark | TO VERIFY | NOT YET PINNED | publication-linked dataset and example results | established research dataset | LOW as benchmark | generic crack-data sourcing | BENCHMARK | PARK | Useful secondary crack/segmentation reference; older and broader than facade-specific BFD-UAV2K |
-| FergusInLondon/dji_parse | HORIZONTAL | parse DJI MP4 subtitle telemetry | MP4 with subtitle telemetry -> CSV/JSON/GPX with time/GPS/altitude/velocity | permissive MIT text in LICENSE | 2022-12-31 | CI badges; parser behavior documented | small focused utility | LOW | custom timestamp->GPS parser | COMPONENT candidate | EVALUATE | Directly matches simple timestamp->telemetry path if Air 3S records compatible subtitle telemetry; Air 3S compatibility unverified |
-| jetervaz/dji-telemetry | HORIZONTAL | parse per-frame DJI SRT telemetry + time lookup | SRT -> structured frames/CSV/JSON/GPX/overlay | MIT per README | NOT YET PINNED | tested with DJI Neo 2 per README | small active-looking utility | LOW | custom SRT parser/time lookup | COMPONENT candidate | EVALUATE | Provides get_frame_at_time and camera/GPS fields; Air 3S compatibility unverified |
-| aero-oli/DatCon | HORIZONTAL | decode DJI .DAT flight logs | unencrypted .DAT -> high-rate CSV/KML/logs | permissive; full text in LICENSE.md | NOT YET PINNED | developer fork of DatCon 3.5 behavior | legacy-capability reference | MEDIUM-HIGH | binary flight-log parser | REFERENCE_IMPLEMENTATION / COMPONENT candidate | PARK | Richer telemetry possible, but README warns newer/encrypted DJI logs may fail; do not assume Air 3S support |
+Detailed search evidence:
+see research/SEARCH_LOG.md.
 
-## Search log — first pass
+## Serious candidates and references
 
-VERTICAL queries attempted:
-- drone inspection infrastructure
-- UAV inspection
+| Name | URL / pinned commit | Search type | Problem solved | Input | Output | License | Last active | Tests / evidence | Documentation | GPU / CPU | Maturity | Integration cost | What MP can learn | Replaces what? | Integration role | Decision | Why |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| FFmpeg | https://github.com/FFmpeg/FFmpeg / 0eb6a369 | HORIZONTAL | media decode/extraction | video | frames/clips/timebase data | LGPL-2.1+ default; config-sensitive | 2026-10-01 | mature upstream project; MP NOT_RUN | extensive | CPU baseline; HW decode optional | mature | LOW | use proven decode/timebase | custom ingestion engine | DEPENDENCY candidate | EVALUATE | smallest path for deterministic post-flight extraction |
+| OpenCV | https://github.com/opencv/opencv / 237b3c2e | HORIZONTAL | frame/image operations | video/frame | arrays/transforms | Apache-2.0 | 2026-10-01 | mature upstream; MP NOT_RUN | extensive | CPU; GPU optional modules | mature | LOW | simple frame/crop operations | custom CV utility layer | DEPENDENCY candidate | EVALUATE | already matches thin post-decode needs |
+| PySceneDetect | https://github.com/Breakthrough/PySceneDetect / 81c414cb | HORIZONTAL | cut/scene detection | video | scene intervals/images | BSD-3-Clause | 2026-09-21 | upstream tests/benchmarks; MP NOT_RUN | strong CLI/API docs | CPU/OpenCV | production/stable per package metadata | LOW | scene-change handling | custom scene detector | REFERENCE | PARK | scene cuts are not defect/recheck events |
+| IIQC | https://github.com/fwan133/IIQC / b60ddf0a | HORIZONTAL | UAV inspection quality + recollection | images + bridge/pose context | quality/recollection feedback | UNRESOLVED; package.xml license TODO, mixed notices | 2023-11-15 | README reports validation; MP NOT_RUN | research README | CPU/3D/ROS stack dependent | research prototype | HIGH direct / LOW reference | quality→recollection architecture | custom quality architecture | REFERENCE_IMPLEMENTATION | LEARN | closest problem, but too heavy/unclear license for direct component |
+| BRISQUE | https://github.com/rehanguha/brisque / 42c854ef | HORIZONTAL | no-reference image quality score | image ndarray | numeric score | Apache-2.0 | pinned 2026-10-01 snapshot | examples/tests in package; MP NOT_RUN | good README | CPU | packaged library | LOW | whether generic IQA helps reject bad frames | custom IQA model | COMPONENT candidate | EVALUATE | clean licensed minimal quality signal |
+| Anomalib PatchCore | https://github.com/open-edge-platform/anomalib / 1f503a6c | HORIZONTAL | anomaly detection from normal reference | normal refs + test image | anomaly score/map | Apache-2.0 code; backbone weights separate | pinned 2026-10-01 snapshot | production/stable metadata; MP NOT_RUN | extensive | CPU and accelerator extras available | mature library | MEDIUM | anomaly ranking without defect classes | bespoke anomaly detector | COMPONENT candidate | EVALUATE | directly tests unknown-irregularity branch |
+| AI-Visual-Inspector | https://github.com/AliAbdien/AI-Visual-Inspector / 100f7468 | HORIZONTAL | deterministic anomaly verdict + constrained VLM explanation | image | verdict/heatmap + text | no LICENSE found | 2026-09-11 | README reports real runs and tests; MP NOT_RUN | strong project README/setup | PatchCore CPU possible; EfficientAd GPU; Ollama model dependent | working prototype | LOW as reference | detector authority vs VLM description | ad-hoc anomaly/VLM arbitration | REFERENCE_IMPLEMENTATION | LEARN | useful mechanism, license blocks direct reuse assumption |
+| BFD-UAV2K | https://github.com/Real-world-UAV-Structural-Defects/BFD-UAV2K / 18a4a3a1 | HORIZONTAL / BENCHMARK | real UAV facade defect benchmark | 2,000 facade images | detector metrics/failure patterns | PENDING per README | 2026-06-10 | reported benchmark only; MP NOT_RUN | detailed README | model-dependent | benchmark release | LOW as reference | detector-family trade-offs on close task | familiarity-based detector choice | BENCHMARK | EVALUATE | closest task evidence, but use rights/checkpoints unresolved |
+| SAM2 | https://github.com/facebookresearch/sam2 / 2b90b9f5 | HORIZONTAL | prompted image/video segmentation | video + point/box prompt | masks/object IDs over frames | Apache-2.0 code + checkpoints per README | 2024-12-16 | published benchmarks; MP NOT_RUN | strong README/notebooks | GPU recommended; Python>=3.10, torch>=2.5.1 | mature research release | MEDIUM | candidate-region persistence | custom video mask tracker | COMPONENT candidate | EVALUATE | clean interface/license for first propagation smoke |
+| Cutie | https://github.com/hkchengrex/Cutie / ec5cdd4c | HORIZONTAL | video object segmentation | frame sequence + initial mask | propagated masks | MIT code; weights terms not separately established | 2024-11-08 | research evaluation; MP NOT_RUN | README/scripts | CUDA-oriented demo; PyTorch | mature research code | MEDIUM | alternative VOS behavior | custom VOS | COMPONENT alternative | PARK | useful fallback if SAM2 fails; weight terms need clarity |
+| DEVA | https://github.com/hkchengrex/Tracking-Anything-with-DEVA / 404a112d | HORIZONTAL | image-model + generic temporal propagation/fusion | image detections/segments + video | coherent temporal segmentation | no LICENSE found | pinned snapshot | research paper/demo; MP NOT_RUN | strong README | GPU/PyTorch; optional Gurobi path | research framework | HIGH direct / LOW reference | detector→temporal propagation architecture and false-positive risks | custom temporal fusion concept | REFERENCE_IMPLEMENTATION | LEARN | very relevant mechanism but dependency/license complexity |
+| Weighted Boxes Fusion | https://github.com/ZFTurbo/Weighted-Boxes-Fusion / 96880f3d | HORIZONTAL | same-frame detector ensemble | boxes/scores/labels from models | fused boxes/scores/labels | MIT | 2026-07-27 | pytest suite documented; MP NOT_RUN | concise README/examples | CPU; NumPy/Numba | stable small package | LOW | geometry fusion vs provenance needs | custom NMS/WBF code | COMPONENT candidate | EVALUATE | solves same-frame overlap cheaply |
+| Norfair | https://github.com/tryolabs/norfair / e517b423 | HORIZONTAL | detector-agnostic temporal association | detections per frame | track IDs/trajectories | BSD-3-Clause | 2025-04-30 | CI/demos/benchmarks; MP NOT_RUN | extensive | core CPU; detector may need GPU | production/stable package metadata | LOW-MEDIUM | moving-camera association/custom distance | custom generic tracker | COMPONENT candidate | EVALUATE | best fit among inspected generic trackers for unusual moving-camera case |
+| tank-inspection-uav | https://github.com/mercwrite/tank-inspection-uav / 98832959 | VERTICAL/HORIZONTAL reference | spatial defect dedup in mapped coordinates | visual/geometric 3D defect observations | deduplicated defect registry | no LICENSE found | 2026-06-12 | code inspected; MP NOT_RUN | detailed README | ROS/PX4/GPU stack | prototype | LOW as reference / HIGH direct | simple coordinate-radius dedup | custom later spatial dedup | REFERENCE_IMPLEMENTATION | LEARN | actual aggregator source shows concise solved mechanism once coordinates exist |
+| Hawk-I | https://github.com/Arvoxis/hawk-i / 0af5ec50 | VERTICAL | integrated drone inspection stack | camera/detections/GPS | masks/verification/report/dashboard | UNRESOLVED; no LICENSE file/text found in inspected root/README | 2026-09-30 | README/tests documented; MP NOT_RUN | detailed | Jetson/GCS GPU architecture | integrated prototype | LOW reference / HIGH direct | detector→segmentation→verification→report boundaries | inventing full integration pattern | REFERENCE_IMPLEMENTATION | LEARN | architecture competitor, not target |
+| AegisInspect | https://github.com/AritraAcherjee/autonomous-drone-infrastructure-inspection / 816a2861 | VERTICAL | inspection persistence/mapping/evidence | detections/sensors | persistent mapped findings/reports | no LICENSE found | 2026-09-30 | measured/demonstrated/pending evidence labels | detailed | ROS/Gazebo/LiDAR stack | mature capstone prototype | LOW reference / HIGH direct | persistent IDs, repeated observations, provenance, review state | custom evidence/persistence concepts | REFERENCE_IMPLEMENTATION | LEARN | unusually disciplined evidence boundary |
+| Dual-UAV pipeline inspection | https://github.com/carloscs04/uav-vision-pipeline-inspection / 5d4389b1 | VERTICAL | defect logging → targeted second inspection | primary detections + telemetry | target manifest + second UAV revisit | MIT | 2026-08-31 | real project code/docs; MP NOT_RUN | good README | Tello/FFmpeg/YOLO stack | project prototype | LOW reference / HIGH direct | CandidateEvent→reinspection handoff | inventing revisit semantics | REFERENCE_IMPLEMENTATION | LEARN | validates durable flagged-location→recheck pattern |
+| RDMO Digital Twin | https://github.com/EdwinTSalcedo/RDMO-DigitalTwin / 11522688 | VERTICAL | compare inspection recovery policies | simulated inspection state | recovery coverage/time/energy | no LICENSE found | 2026-09-03 | recorded experiment tables/videos | extensive | Unity + optional NVIDIA GPU | research framework | LOW reference / HIGH direct | hover/micro/skip revisit trade-offs | assuming one universal RECHECK action | BENCHMARK / REFERENCE | LEARN | useful future policy evidence, outside first post-flight proof |
 
-HORIZONTAL queries attempted:
-- image quality UAV
-- facade defect detection
-- DJI telemetry parser
-- DJI waypoint KMZ
+## Secondary / parked candidates
 
-Some broad natural-language GitHub searches returned no results; simpler repository-search terms produced useful candidates. Search failure is recorded rather than interpreted as absence of solutions.
+| Candidate | Pinned identity | Disposition | Reason |
+|---|---|---|---|
+| PyAV | PyAV-Org/PyAV@b618b2d9 | PARK | direct FFmpeg likely simpler until packet-level access is needed |
+| VidGear | abhiTronix/vidgear@549de2b1 | PARK | broader streaming framework than first file-ingestion need |
+| Framework-for-UAV-image-quality | GattuPriyanka/...@9344d90c | LEARN/PARK | concrete blur/exposure/NIQE/BRISQUE metrics but no LICENSE found |
+| XMem | hkchengrex/XMem@f3b841d5 | LEARN/PARK | predecessor to Cutie; useful long-video reference |
+| Track-Anything | gaomingqi/Track-Anything@5e410c60 | PARK | interactive user-click flow not first MP automation path |
+| ByteTrack | FoundationVision/ByteTrack@d1bf0191 | PARK | strong MOT but less flexible fit than Norfair for static defect/moving camera case |
+| SAHI | obss/sahi@80ebdb69 | EVALUATE LATER | mode for an accepted detector, not independent detector |
+| Ultralytics | ultralytics/ultralytics@9b790cf2 | PARK pending weights | AGPL-3.0 framework; generic weights do not prove defect capability |
+| FBD / InsPLAD / UAV crack datasets | see PINNED_SOURCES | LEARN/PARK | secondary benchmarks; different task/domain or licensing not yet sufficient |
+| CVAT | cvat-ai/cvat@cde80590 | PARK | annotation infrastructure only if smoke tests create real labeling burden |
+| Ollama/Gemma | ollama/ollama@3b1999d1 + model unresolved | PARK | interpretation after candidate value; model license separate |
+| Telemetry parsers | see PINNED_SOURCES | PARK | candidate set exists; actual Air 3S file compatibility is later question |
+| WayPoint / DroneRoute / Air3S format research | see PINNED_SOURCES | PARK | route/recheck automation is later and custom generator is not justified |
+| COLMAP | colmap/colmap@25ff12a8 | PARK | geometry is not needed for first vision-value proof |
+
+## Radar conclusion
+
+The reconnaissance does not support a nine-component custom build.
+
+The strongest M2 questions can be tested with existing components:
+- FFmpeg/OpenCV — ingestion,
+- BRISQUE — one quality signal,
+- Anomalib/PatchCore — anomaly branch,
+- SAM2 — prompted temporal mask persistence,
+- WBF — same-frame geometric fusion,
+- Norfair — temporal association.
+
+Known-defect detector:
+BLOCKED/PARK until task-relevant weights/data licensing is resolved.
+
+Potential genuinely MP-specific gap:
+provenance-preserving CandidateEvent construction across observations/tracks.
+This is a discovered gap, not authorization to implement it.
 
 ## Rule
-No candidate becomes a dependency or architecture choice from README similarity alone. EVALUATE means inspect more and, where justified, run the cheapest discriminating test.
+
+No candidate becomes a dependency or architecture choice from source similarity alone.
+EVALUATE means: include in the cheapest discriminating smoke test after authorization.

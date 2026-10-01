@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 3
+state_version: 4
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT
-changed_fields: working_method, research_gate, current_milestone, done_criteria, next_action, state_version
+changed_fields: governance_enforcement, research_gate_automation, state_version, next_action
 
 ## Approved goal
 Sprawdzić, czy z istniejących narzędzi można złożyć minimalne laboratorium, które przyjmuje materiał z lotu inspekcyjnego, analizuje go kilkoma komplementarnymi metodami, łączy wyniki i przekazuje operatorowi ograniczoną listę miejsc CONFIRM / REJECT / RECHECK.
@@ -112,5 +112,24 @@ merge_to_main: NOT AUTHORIZED
 build_orchestrator: NOT AUTHORIZED
 publish/release/deploy: NOT AUTHORIZED
 
+## Governance enforcement
+Research Gate is now represented by:
+- AGENTS.md
+- governance/BUILD_POLICY.md
+- research/records/*.json
+- governance/build_requests/*.json
+- scripts/check_research_gate.py
+- .github/workflows/research-gate.yml
+- .github/PULL_REQUEST_TEMPLATE.md
+- .github/CODEOWNERS
+
+The automated gate is intended to block protected implementation-like changes without accepted research/build records.
+
+Repository ruleset status observed on 2026-10-01:
+- repository rulesets: none configured
+- connector cannot write branch-protection/ruleset settings
+
+Therefore hard merge enforcement on main is PENDING OWNER CONFIGURATION after review.
+
 ## Next action
-Independent review of the revised M1 plan, search-before-build gate and initial Technology Reconnaissance seed on branch audit/m1-repo-suitability-v2.
+Independent review of M1 Technology Reconnaissance plus the new Research Gate enforcement design on branch audit/m1-repo-suitability-v2.

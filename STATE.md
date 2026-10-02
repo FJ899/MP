@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 19
+state_version: 20
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_02A_execution_result, M2_02A_evidence, review_status, state_version, next_action
+changed_fields: M2_02A_human_acceptance, M2_02A_historical_status_cleanup, M2_02B_proposal, state_version, next_action
 
 ## Approved goal
 
@@ -66,7 +66,7 @@ Commits after that version record the HUMAN decision and prepare transition plan
 ## Current phase
 
 current_phase:
-M2 — M2-01 ACCEPTED / M2-02A EXECUTED / REVIEW PENDING
+M2 — M2-01 ACCEPTED / M2-02A ACCEPTED / M2-02B PROPOSAL ONLY
 
 MP Architecture v0.1:
 NOT READY TO FREEZE / NOT AUTHORIZED TO FREEZE
@@ -407,10 +407,10 @@ proposal_status:
 REVISION_2 / REVIEWED PASS / HUMAN AUTHORIZED
 
 execution_status:
-AUTHORIZED / EXECUTION_PENDING
+HISTORICAL / SUPERSEDED — M2-02A was later executed and HUMAN_ACCEPTED
 
 execution_authorization:
-GRANTED FOR M2-02A REVISION 2 ONLY
+HISTORICAL / SUPERSEDED — GRANTED FOR M2-02A REVISION 2 ONLY AND CONSUMED
 
 BRISQUE branch:
 BLOCKED_BY_MODEL_ARTIFACT_TERMS
@@ -422,7 +422,7 @@ BRISQUE unresolved artifacts:
 Proposed alternative:
 use already available OpenCV/NumPy only, with no pretrained model and no new installation, to test directional sanity of:
 - Laplacian variance for controlled blur,
-- mean luma,
+- mean_gray_intensity,
 - black clipping fraction,
 - white clipping fraction
 
@@ -438,7 +438,9 @@ no reviewed naturally degraded Air 3S frame set with human quality labels is ava
 Therefore M2-02A can only test deterministic directional sanity, not real-world threshold/classification performance.
 
 No quality threshold is proposed or accepted.
-No experiment has been executed under M2-02A.
+Historical statement — SUPERSEDED:
+"No experiment has been executed under M2-02A."
+M2-02A was subsequently executed, independently reviewed PASS and HUMAN_ACCEPTED.
 
 
 ## M2-02A proposal review correction
@@ -453,10 +455,10 @@ proposal_revision:
 2
 
 execution_status:
-NOT_STARTED
+HISTORICAL / SUPERSEDED — NOT_STARTED at proposal-review stage
 
 execution_authorization:
-NOT_GRANTED
+HISTORICAL / SUPERSEDED — NOT_GRANTED at proposal-review stage
 
 resolved_review_point:
 M2-02A-P01 — strict clipping inequality.
@@ -475,7 +477,9 @@ Non-blocking notes incorporated:
 - exact dtype conversions, GaussianBlur/Laplacian parameters, BORDER_DEFAULT and serialization/raw clipping counts are specified;
 - M2-01 historical review status is marked as superseded by PASS + HUMAN acceptance.
 
-No M2-02A command has been executed.
+Historical statement — SUPERSEDED:
+"No M2-02A command has been executed."
+M2-02A was subsequently executed under HUMAN-M2-02A-AUTH-001 and HUMAN_ACCEPTED.
 
 
 ## M2-02A HUMAN authorization
@@ -537,10 +541,10 @@ execution_result:
 PASS
 
 review_status:
-PENDING_INDEPENDENT_REVIEW
+HISTORICAL / SUPERSEDED — AI-B REVIEW PASS
 
 result_acceptance:
-PENDING HUMAN ARTIFACT DECISION AFTER REVIEW
+HUMAN_ACCEPTED
 
 source:
 Air3s_normal.MP4
@@ -676,3 +680,118 @@ AI-B independently reviews the M2-02A execution evidence.
 
 Do not start another experiment automatically.
 Do not create a production quality gate.
+
+
+## M2-02A artifact decision
+
+decision_id:
+HUMAN-ARTIFACT-DECISION-M2-02A-001
+
+source:
+HUMAN_EXPLICIT_ACCEPT
+
+accepted_experiment:
+M2-02A-20261002-AIR3S-QUALITY-001
+
+accepted_subject_version:
+75f216e0edfc0e975eb5408657acc70584eb060f
+
+accepted_review:
+MP/m2-02a-execution-review-001/AI-B
+
+accepted_review_verdict:
+PASS
+
+artifact_decision:
+ACCEPT
+
+acceptance_scope:
+M2-02A revision 2 result for p10 / p50 / p90 and ORIGINAL / BLUR_SIGMA4 / DARK_MINUS96 / BRIGHT_PLUS96.
+
+accepted_meaning:
+- two-run reproducibility on the recorded synthetic states;
+- provenance continuity from accepted M2-01;
+- expected directional response of laplacian_variance and mean_gray_intensity;
+- both clipping signals exercised under frozen transforms.
+
+does_not_establish:
+- natural good/bad Air 3S discrimination,
+- operator usefulness,
+- production thresholds,
+- FP/FN behavior,
+- quality gate,
+- equivalence to natural capture failures,
+- superiority over BRISQUE.
+
+independent_review_limitation:
+AI-B did not independently replay GaussianBlur pixels because OpenCV was unavailable in its review environment; that portion was reviewed through script inspection, A/B evidence and directional checks.
+
+evidence_practice_forward_rule:
+future experiments must preserve exact command invocations, relevant stdout/stderr, exit statuses, transient script identity and runtime identity.
+Historical commands that were not preserved must not be reconstructed from memory as evidence.
+
+Important:
+the accepted M2-02A result artifact remains exactly 75f216e0edfc0e975eb5408657acc70584eb060f.
+Later commits record HUMAN acceptance and prepare a separate proposal only.
+
+## M2-02B next experiment proposal
+
+proposal_id:
+M2-02B
+
+name:
+Natural Quality Relevance Pilot
+
+proposal_artifact:
+M2_02B_NATURAL_QUALITY_RELEVANCE_PROPOSAL.md
+
+proposal_status:
+READY_FOR_INDEPENDENT_REVIEW
+
+execution_status:
+NOT_STARTED / BLOCKED_BY_INPUT
+
+execution_authorization:
+NOT_GRANTED
+
+input_requirement:
+three matched scene groups, each with REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT native Air 3S material.
+
+input_availability:
+NOT YET ESTABLISHED
+
+human_judgment:
+REQUIRED / MUST BE FROZEN BEFORE METRIC COMPARISON
+
+primary_question:
+Do the same model-free signals move in the same direction as HUMAN inspection-usability judgment on matched naturally degraded Air 3S captures?
+
+new_installation:
+NONE PROPOSED
+
+pretrained_models:
+NONE PROPOSED
+
+flight_or_capture_execution:
+NOT INCLUDED / NOT AUTHORIZED
+
+BRISQUE:
+BLOCKED_BY_MODEL_ARTIFACT_TERMS
+
+No M2-02B command has been executed.
+
+## Next action
+
+AI-B independently reviews M2_02B_NATURAL_QUALITY_RELEVANCE_PROPOSAL.md.
+
+After proposal review, HUMAN may decide:
+- AUTHORIZE_M2_02B,
+- ACCEPT_PLAN_ONLY,
+- REQUEST_CHANGES,
+- DEFER.
+
+Even if the proposal is accepted, M2-02B cannot start until the complete natural input set is supplied and validated.
+
+Do not execute a flight or record new material under M2-02B authorization.
+Do not execute BRISQUE, M2-03 or later work.
+Do not freeze architecture.

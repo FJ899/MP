@@ -407,3 +407,73 @@ A later HUMAN artifact decision is required after independent review.
 
 Next action:
 execute only M2-02A revision 2 and stop after producing the review candidate.
+
+
+## D-029 — HUMAN accepts M2-02A execution result
+
+decision_id:
+HUMAN-ARTIFACT-DECISION-M2-02A-001
+
+source:
+HUMAN_EXPLICIT_ACCEPT
+
+accepted_experiment:
+M2-02A-20261002-AIR3S-QUALITY-001
+
+accepted_subject_version:
+75f216e0edfc0e975eb5408657acc70584eb060f
+
+accepted_review:
+MP/m2-02a-execution-review-001/AI-B
+
+review_verdict:
+PASS
+
+artifact_decision:
+ACCEPT
+
+acceptance_scope:
+M2-02A revision 2 result for p10 / p50 / p90 and ORIGINAL / BLUR_SIGMA4 / DARK_MINUS96 / BRIGHT_PLUS96.
+
+Accepted evidence meaning:
+- two-run reproducibility for the recorded 12 states;
+- provenance continuity from accepted M2-01 source frames;
+- source and derived RGB24 hash consistency;
+- expected directional response of Laplacian variance and mean_gray_intensity;
+- black and white clipping signals were EXERCISED_CONFIRMED under the frozen transforms.
+
+This acceptance does NOT establish:
+- discrimination of naturally good vs naturally bad Air 3S footage,
+- operator usefulness,
+- production quality thresholds,
+- false-positive / false-negative behavior,
+- a production quality gate,
+- equivalence of the synthetic transforms to natural capture failures,
+- superiority over BRISQUE.
+
+Independent-review limitation preserved:
+AI-B did not independently replay GaussianBlur pixels because its review environment lacked OpenCV.
+That part was verified by script inspection, Run A/B evidence and directional criteria rather than full independent pixel replay.
+
+Evidence-practice note:
+historical reconstruction command lines that were not preserved must not be recreated from memory as evidence.
+Future experiments should preserve exact invocations plus relevant stdout/stderr, exit statuses, script identity and runtime identity.
+
+This acceptance does NOT authorize:
+- another experiment,
+- BRISQUE,
+- dependency installation,
+- pretrained models,
+- training,
+- production thresholds,
+- quality-gate implementation,
+- M2-03,
+- BUILD orchestrator,
+- merge to main,
+- architecture freeze,
+- flight/route execution,
+- publish/release/deploy.
+
+Next action:
+prepare a separate proposal for the smallest useful natural-degradation Air 3S test with HUMAN quality judgment.
+Do not execute it without separate HUMAN authorization.

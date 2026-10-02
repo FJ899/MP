@@ -661,7 +661,7 @@ NONE.
 
 Main cost:
 - obtaining suitable natural input if it does not already exist;
-- one HUMAN blind review of 12 frames;
+- one HUMAN masked-condition review of 12 frames;
 - small CPU-only metric pass.
 
 ## Authorization requested if review passes

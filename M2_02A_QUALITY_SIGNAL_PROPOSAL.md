@@ -1,7 +1,7 @@
 # Next Experiment Proposal — M2-02A Model-Free Quality Signal Sanity Check
 
 status:
-PROPOSED_FOR_REVIEW_AND_HUMAN_DECISION
+REVISION_2 / PROPOSED_FOR_REVIEW_AND_HUMAN_DECISION
 
 experiment_id:
 M2-02A
@@ -241,9 +241,12 @@ Record:
 Hypothesis:
 BLUR should reduce this value relative to ORIGINAL for the same source frame.
 
-### mean_luma
+### mean_gray_intensity
 
-    mean(gray)
+    mean(gray, dtype=float64)
+
+This is grayscale intensity produced by cv2.COLOR_RGB2GRAY.
+It is NOT claimed to be a physical luminance measurement.
 
 Hypotheses:
 DARK_CLIP should reduce it.
@@ -253,17 +256,86 @@ BRIGHT_CLIP should increase it.
 
     count(gray <= 5) / pixel_count
 
-Hypothesis:
-DARK_CLIP should increase it.
+Directional expectation:
+DARK_CLIP must not decrease this fraction.
+
+Response-exercised condition:
+black clipping is considered EXERCISED for a source frame only if:
+
+    black_fraction(DARK_CLIP)
+    >
+    black_fraction(ORIGINAL)
+
+If equality holds, record:
+
+    CLIPPING_RESPONSE_NOT_EXERCISED
+
+for the black-clipping signal on that source frame.
 
 ### white_fraction
 
     count(gray >= 250) / pixel_count
 
-Hypothesis:
-BRIGHT_CLIP should increase it.
+Directional expectation:
+BRIGHT_CLIP must not decrease this fraction.
+
+Response-exercised condition:
+white clipping is considered EXERCISED for a source frame only if:
+
+    white_fraction(BRIGHT_CLIP)
+    >
+    white_fraction(ORIGINAL)
+
+If equality holds, record:
+
+    CLIPPING_RESPONSE_NOT_EXERCISED
+
+for the white-clipping signal on that source frame.
 
 No production threshold is proposed for any metric.
+
+Important:
+the fixed ±96 transforms are frozen before execution.
+Do not tune transform parameters after seeing results to force clipping-response exercise or PASS.
+
+## Exact runtime/data-type contract
+
+Source frame representation:
+- RGB24 uint8, shape H×W×3.
+
+BLUR:
+- cv2.GaussianBlur
+- input dtype: uint8
+- ksize=(0,0)
+- sigmaX=4.0
+- sigmaY=4.0
+- borderType=cv2.BORDER_DEFAULT explicitly recorded.
+
+DARK_CLIP / BRIGHT_CLIP:
+- cast source RGB24 uint8 -> int16 before ±96 arithmetic;
+- np.clip(..., 0, 255);
+- cast final derivative -> uint8.
+
+Grayscale:
+- cv2.cvtColor(rgb_uint8, cv2.COLOR_RGB2GRAY);
+- result dtype expected uint8.
+
+Laplacian:
+- cv2.Laplacian(gray_uint8, cv2.CV_64F, ksize=1, borderType=cv2.BORDER_DEFAULT);
+- variance computed in float64.
+
+Fractions:
+- integer count / integer pixel_count;
+- serialized as decimal values with sufficient precision to round-trip comparison within the same runtime;
+- raw numerator counts and pixel_count are also stored to avoid relying only on floating serialization.
+
+Mean grayscale intensity:
+- float64 mean;
+- serialize with a stable machine-readable representation (for example JSON/CSV decimal with 17 significant digits).
+
+Metric rows must therefore retain both:
+- floating metric values,
+- relevant raw counts for clipping fractions.
 
 ## Minimal execution structure
 
@@ -317,9 +389,18 @@ Every metric row must retain:
 - OpenCV version,
 - NumPy version,
 - laplacian_variance,
-- mean_luma,
+- mean_gray_intensity,
 - black_fraction,
-- white_fraction.
+- black_count,
+- white_fraction,
+- white_count,
+- pixel_count,
+- black_clipping_response:
+  - EXERCISED_CONFIRMED
+  - CLIPPING_RESPONSE_NOT_EXERCISED
+- white_clipping_response:
+  - EXERCISED_CONFIRMED
+  - CLIPPING_RESPONSE_NOT_EXERCISED.
 
 This preserves:
 
@@ -349,37 +430,80 @@ For p10, p50 and p90 independently:
 
 All three pairs must satisfy the direction.
 
-### Dark directional sanity
+### Dark mean-intensity sanity
 
 For each source frame:
 
-    mean_luma(DARK_CLIP)
+    mean_gray_intensity(DARK_CLIP)
     <
-    mean_luma(ORIGINAL)
+    mean_gray_intensity(ORIGINAL)
 
-and:
+All three pairs must satisfy the direction.
+
+### Black clipping directional sanity
+
+For each source frame:
 
     black_fraction(DARK_CLIP)
-    >
+    >=
     black_fraction(ORIGINAL)
 
-All three pairs must satisfy both directions.
+A strict increase means:
 
-### Bright directional sanity
+    black_clipping_response = EXERCISED_CONFIRMED
+
+Equality means:
+
+    black_clipping_response = CLIPPING_RESPONSE_NOT_EXERCISED
+
+Equality is NOT a signal failure by itself.
+
+### Bright mean-intensity sanity
 
 For each source frame:
 
-    mean_luma(BRIGHT_CLIP)
+    mean_gray_intensity(BRIGHT_CLIP)
     >
-    mean_luma(ORIGINAL)
+    mean_gray_intensity(ORIGINAL)
 
-and:
+All three pairs must satisfy the direction.
+
+### White clipping directional sanity
+
+For each source frame:
 
     white_fraction(BRIGHT_CLIP)
-    >
+    >=
     white_fraction(ORIGINAL)
 
-All three pairs must satisfy both directions.
+A strict increase means:
+
+    white_clipping_response = EXERCISED_CONFIRMED
+
+Equality means:
+
+    white_clipping_response = CLIPPING_RESPONSE_NOT_EXERCISED
+
+Equality is NOT a signal failure by itself.
+
+### Full-hypothesis PASS gate
+
+Overall M2-02A PASS requires:
+- reproducibility PASS;
+- blur directional sanity PASS;
+- dark mean-intensity sanity PASS;
+- bright mean-intensity sanity PASS;
+- black clipping response EXERCISED_CONFIRMED on at least one tested source frame and no tested frame showing a decrease;
+- white clipping response EXERCISED_CONFIRMED on at least one tested source frame and no tested frame showing a decrease;
+- provenance PASS.
+
+If all reproducibility / blur / mean-intensity checks pass but one or both clipping signals are never EXERCISED, the overall result is:
+
+    INCONCLUSIVE
+
+with the already-resolved sub-results preserved.
+
+No transform parameter may be changed after observing results to convert this INCONCLUSIVE into PASS.
 
 ### Provenance
 
@@ -390,10 +514,15 @@ Every metric row is traceable to M2-01 source/frame identity and exact derived-i
 FAIL if a correctly executed controlled test shows that one of the proposed signals does not respond in the intended direction across the required pairs, for example:
 
 - BLUR does not reduce Laplacian variance for one or more selected frames;
-- DARK_CLIP does not reduce mean_luma or increase black_fraction;
-- BRIGHT_CLIP does not increase mean_luma or white_fraction;
+- DARK_CLIP does not reduce mean_gray_intensity;
+- BRIGHT_CLIP does not increase mean_gray_intensity;
+- black_fraction decreases under DARK_CLIP;
+- white_fraction decreases under BRIGHT_CLIP;
 - repeated generation/measurement is not reproducible;
 - provenance cannot bind a metric observation to the source frame and transform.
+
+A lack of strict clipping increase is NOT itself FAIL.
+If the clipping category was not exercised, record CLIPPING_RESPONSE_NOT_EXERCISED and apply the overall INCONCLUSIVE rule above.
 
 FAIL means:
 the affected signal/definition should not automatically proceed as a quality-gate candidate.
@@ -408,13 +537,14 @@ INCONCLUSIVE if the experiment is started but a procedure/input/environment defe
 - exact source frame cannot be reconstructed;
 - runtime changes between runs;
 - transform implementation is not deterministic due to an execution defect;
-- evidence capture fails.
+- evidence capture fails;
+- reproducibility / blur / mean-intensity checks are interpretable, but one or both clipping signals are never exercised by the frozen transforms; in that specific case preserve the resolved sub-results and set the full-hypothesis result to INCONCLUSIVE.
 
 ## What PASS would mean
 
 PASS would establish only:
 
-the selected classical metrics are deterministic and directionally sensitive to three deliberately controlled degradation types on three provenance-anchored frames from the tested sample.
+the selected classical metrics are deterministic on the tested inputs; blur and grayscale-intensity signals move in the expected direction; and both clipping signals were actually exercised and responded without decrease under the frozen transforms.
 
 PASS would NOT establish:
 
@@ -424,7 +554,8 @@ PASS would NOT establish:
 - RECHECK policy;
 - production suitability;
 - superiority over BRISQUE;
-- equivalence to natural motion blur, defocus or exposure failures.
+- equivalence to natural motion blur, defocus or exposure failures;
+- evidence that the synthetic clipping fractions are useful to an operator beyond this sanity check.
 
 ## What happens after PASS
 
@@ -528,3 +659,21 @@ PROPOSE M2-02A FOR REVIEW.
 BRISQUE remains BLOCKED_BY_MODEL_ARTIFACT_TERMS.
 
 No experiment has been executed under this proposal.
+
+## Review correction history
+
+Revision 2 incorporates AI-B review MP/m2-02a-proposal-review-001/AI-B.
+
+Resolved point:
+M2-02A-P01 — strict clipping inequality.
+
+The proposal now distinguishes:
+- no decrease,
+- strict response exercise,
+- CLIPPING_RESPONSE_NOT_EXERCISED,
+- full-hypothesis INCONCLUSIVE when clipping is not exercised.
+
+Non-blocking review notes incorporated:
+- grayscale intensity is not called physical luminance;
+- exact dtype, GaussianBlur/Laplacian parameters, border handling and serialization/raw clipping counts are recorded;
+- no post-result transform tuning is permitted.

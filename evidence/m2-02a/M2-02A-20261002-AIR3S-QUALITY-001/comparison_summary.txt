@@ -1,0 +1,32 @@
+rows_runA 12
+rows_runB 12
+reproducibility_differences_excluding_run_id 0
+
+PAIR RESULTS
+p10
+  laplacian original 258.1664827912528 blur 1.3808717930152166 direction_pass True
+  mean original 73.49754171489198 dark 19.012452256944446 bright 160.90248758198302 dark_pass True bright_pass True
+  black original 793888 0.095713734567901235 dark 6344779 0.76494731385030867 response EXERCISED_CONFIRMED
+  white original 504320 0.060802469135802471 bright 973547 0.11737401138117284 response EXERCISED_CONFIRMED
+p50
+  laplacian original 259.44819342657763 blur 1.3803216628057933 direction_pass True
+  mean original 73.393879846643514 dark 18.941924430941359 bright 160.82400233892747 dark_pass True bright_pass True
+  black original 783401 0.094449387538580246 dark 6349221 0.76548285590277776 response EXERCISED_CONFIRMED
+  white original 501429 0.060453920717592591 bright 970909 0.11705596547067901 response EXERCISED_CONFIRMED
+p90
+  laplacian original 259.39372157700217 blur 1.3974620225588481 direction_pass True
+  mean original 75.940783299575614 dark 19.978889130015432 bright 163.04578993055554 dark_pass True bright_pass True
+  black original 718724 0.086651716820987656 dark 6176516 0.74466097608024695 response EXERCISED_CONFIRMED
+  white original 531184 0.064041280864197525 bright 1007883 0.12151367187500001 response EXERCISED_CONFIRMED
+
+SUMMARY
+reproducibility_pass True
+blur_direction_pass True
+dark_mean_pass True
+bright_mean_pass True
+black_no_decrease True
+white_no_decrease True
+black_exercised_samples p10,p50,p90
+white_exercised_samples p10,p50,p90
+provenance_source_sha_pass True
+FULL_RESULT PASS

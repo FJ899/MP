@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 20
+state_version: 21
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_02A_human_acceptance, M2_02A_historical_status_cleanup, M2_02B_proposal, state_version, next_action
+changed_fields: M2_02B_proposal_revision_2, matched_input_contract, human_presentation_contract, M2_02A_historical_next_action, state_version, next_action
 
 ## Approved goal
 
@@ -674,12 +674,18 @@ NOT AUTHORIZED
 publish/release/deploy:
 NOT AUTHORIZED
 
-## M2-02A next action
+## M2-02A next action — HISTORICAL / SUPERSEDED
 
+Historical instruction:
 AI-B independently reviews the M2-02A execution evidence.
 
-Do not start another experiment automatically.
-Do not create a production quality gate.
+This was completed by:
+MP/m2-02a-execution-review-001/AI-B — PASS
+
+and followed by:
+HUMAN-ARTIFACT-DECISION-M2-02A-001 — ACCEPT.
+
+Do not treat this historical section as the current next action.
 
 
 ## M2-02A artifact decision
@@ -746,7 +752,7 @@ proposal_artifact:
 M2_02B_NATURAL_QUALITY_RELEVANCE_PROPOSAL.md
 
 proposal_status:
-READY_FOR_INDEPENDENT_REVIEW
+REVISION_2 / PENDING_AI-B_REVIEW
 
 execution_status:
 NOT_STARTED / BLOCKED_BY_INPUT
@@ -782,16 +788,53 @@ No M2-02B command has been executed.
 
 ## Next action
 
-AI-B independently reviews M2_02B_NATURAL_QUALITY_RELEVANCE_PROPOSAL.md.
+AI-B independently reviews M2_02B_NATURAL_QUALITY_RELEVANCE_PROPOSAL.md revision 2.
 
-After proposal review, HUMAN may decide:
+After review PASS, HUMAN may decide:
 - AUTHORIZE_M2_02B,
 - ACCEPT_PLAN_ONLY,
 - REQUEST_CHANGES,
 - DEFER.
 
-Even if the proposal is accepted, M2-02B cannot start until the complete natural input set is supplied and validated.
+Even if later authorized, M2-02B cannot start until the complete natural input set is supplied, matched-group admission is established and input is validated.
 
 Do not execute a flight or record new material under M2-02B authorization.
 Do not execute BRISQUE, M2-03 or later work.
 Do not freeze architecture.
+
+
+## M2-02B proposal review correction
+
+review_packet:
+MP/m2-02b-proposal-review-001/AI-B
+
+review_result:
+REQUEST_CHANGES
+
+proposal_revision:
+2
+
+execution_status:
+NOT_STARTED / BLOCKED_BY_INPUT
+
+execution_authorization:
+NOT_GRANTED
+
+resolved_review_point:
+M2-02B-P01 — insufficiently specified matched-input comparability and inspection usefulness.
+
+Revision-2 additions:
+- each scene requires a frozen scene contract before HUMAN labels and before metrics;
+- scene contract records concrete surface/object, one inspection_question and detail_type_to_judge shared by REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT;
+- matched-group admission requires same surface/object, comparable visual scale, comparable viewpoint/content and recorded material differences;
+- admission is explicitly ADMIT or INPUT_MATCH_INVALID;
+- INPUT_MATCH_INVALID is distinct from HUMAN_DEGRADATION_NOT_EXERCISED and cannot count as evidence against a metric;
+- invalid input after experiment start can make the affected family INCONCLUSIVE while preserving unaffected family results;
+- HUMAN presentation is standardized: same task information, full-frame fit view, native 100% zoom/pan, no enhancement/crop-only presentation;
+- Q-ID review order uses a fixed pre-label permutation independent of metrics;
+- filenames and condition-revealing metadata are hidden;
+- prior source familiarity is recorded as MASKING_LIMITATION_KNOWN_SOURCE_FAMILIARITY instead of claiming full blindness;
+- M2-02A revision-2 RGB24 / RGB2GRAY / Laplacian CV_64F ksize=1 BORDER_DEFAULT / float64 / raw-count serialization contract is pinned for M2-02B.
+
+No new metrics, crops, models, thresholds or execution authority were added.
+No M2-02B command has been executed.

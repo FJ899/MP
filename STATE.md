@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 24
+state_version: 25
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_02B_input_gap_report_002, expanded_material_inventory, potential_scene_clusters, input_status, state_version, next_action
+changed_fields: M2_02B_input_classification_precheck_authorization, state_version, next_action
 
 ## Approved goal
 
@@ -792,17 +792,18 @@ HUMAN decides what to do with the remaining M2-02B input gap.
 
 Eight native candidate clips are now accessible, but no REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT role has been verified and no matched group has been admitted.
 
-A separate future HUMAN decision could authorize an INPUT_CLASSIFICATION_PRECHECK on these existing clips to inspect whether natural degradation segments plausibly exist.
-That precheck is NOT currently authorized.
+INPUT_CLASSIFICATION_PRECHECK is HUMAN_AUTHORIZED under HUMAN-M2-02B-INPUT-CLASSIFICATION-PRECHECK-AUTH-001.
+The authorization is limited to classifying already accessible existing material and does not authorize M2-02B execution.
 
 Other options:
 - provide additional already existing footage;
 - identify known condition/segment information for these files;
 - defer M2-02B.
 
+Execute only the authorized INPUT_CLASSIFICATION_PRECHECK on already accessible material, then stop.
 Do not calculate metrics.
 Do not collect HUMAN labels.
-Do not run formal midpoint-frame selection or matched admission.
+Do not run formal matched-group admission or formal experiment midpoint-frame selection.
 Do not execute a flight or record new material.
 Do not execute M2-02B.
 Do not execute BRISQUE, M2-03 or later work.
@@ -891,6 +892,45 @@ availability_check_does_not_authorize:
 Important:
 the accepted M2-02B plan artifact remains exactly 58be2e74fac96858dbf38ef134bc489614a023c4.
 Later commits may record the HUMAN plan decision, editorial cleanup and input-availability evidence; they do not redefine the accepted plan.
+
+
+## M2-02B INPUT_CLASSIFICATION_PRECHECK authorization
+
+decision_id:
+HUMAN-M2-02B-INPUT-CLASSIFICATION-PRECHECK-AUTH-001
+
+source:
+HUMAN_EXPLICIT_AUTHORIZE_INPUT_CLASSIFICATION_PRECHECK
+
+authorization_context_subject:
+ea3ffdd425197762490dca4cbcfbdcf85bf5c305
+
+precheck_status:
+AUTHORIZED / NOT YET COMPLETED
+
+authorized_scope:
+already accessible existing Air 3S video and associated still/raw material only.
+
+allowed:
+- file/container metadata inspection;
+- representative visual inspection for candidate condition classification;
+- scene clustering;
+- candidate REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT role assessment;
+- readiness/gap reporting.
+
+not_authorized:
+- M2-02B execution;
+- metric calculation;
+- HUMAN quality labeling;
+- formal matched-group admission;
+- formal experiment midpoint-frame selection;
+- new capture/flight;
+- BRISQUE or dependency installation;
+- M2-03+;
+- merge / architecture freeze / publish-release-deploy.
+
+stop_rule:
+stop after INPUT_READINESS or INPUT_GAP_REPORT.
 
 
 ## M2-02B input availability check

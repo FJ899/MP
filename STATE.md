@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 17
+state_version: 18
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_02A_proposal_revision_2, clipping_response_semantics, M2_01_historical_review_status, state_version, next_action
+changed_fields: M2_02A_human_authorization, execution_status, state_version, next_action
 
 ## Approved goal
 
@@ -333,15 +333,15 @@ NOT AUTHORIZED
 
 ## Next action
 
-AI-B reviews M2_02A_QUALITY_SIGNAL_PROPOSAL.md revision 2.
+Execute exactly M2-02A revision 2 under HUMAN-M2-02A-AUTH-001.
 
-After review PASS, HUMAN decides whether to:
-- AUTHORIZE_M2_02A,
-- ACCEPT_PLAN_ONLY,
-- REQUEST_CHANGES,
-- DEFER.
+After execution:
+- record PASS / FAIL / INCONCLUSIVE,
+- preserve compact evidence,
+- submit the result to AI-B for independent review,
+- stop.
 
-Do not execute M2-02A, BRISQUE, M2-03 or later work without separate HUMAN authorization.
+Do not execute BRISQUE, M2-03 or later work.
 Do not freeze architecture.
 
 
@@ -407,13 +407,13 @@ proposal_artifact:
 M2_02A_QUALITY_SIGNAL_PROPOSAL.md
 
 proposal_status:
-REVISION_2 / PENDING_AI-B_REVIEW
+REVISION_2 / REVIEWED PASS / HUMAN AUTHORIZED
 
 execution_status:
-NOT_STARTED
+AUTHORIZED / EXECUTION_PENDING
 
 execution_authorization:
-NOT_GRANTED
+GRANTED FOR M2-02A REVISION 2 ONLY
 
 BRISQUE branch:
 BLOCKED_BY_MODEL_ARTIFACT_TERMS
@@ -479,3 +479,44 @@ Non-blocking notes incorporated:
 - M2-01 historical review status is marked as superseded by PASS + HUMAN acceptance.
 
 No M2-02A command has been executed.
+
+
+## M2-02A HUMAN authorization
+
+decision_id:
+HUMAN-M2-02A-AUTH-001
+
+source:
+HUMAN_EXPLICIT_AUTHORIZE_M2_02A
+
+authorized_subject_version:
+0fdebf44fc5241163f6dee47fcb189e07c5a9586
+
+proposal_revision:
+2
+
+review_reference:
+MP/m2-02a-proposal-review-002/AI-B
+
+review_verdict:
+PASS
+
+authorization_scope:
+exact M2-02A revision 2 only.
+
+Result acceptance:
+NOT_GRANTED / requires later HUMAN artifact decision.
+
+Preserved non-authorizations:
+- BRISQUE,
+- dependency installation,
+- pretrained models,
+- training,
+- production thresholds,
+- quality-gate implementation,
+- M2-03+,
+- BUILD orchestrator,
+- merge,
+- architecture freeze,
+- flight/route execution,
+- publish/release/deploy.

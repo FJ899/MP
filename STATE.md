@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 21
+state_version: 22
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_02B_proposal_revision_2, matched_input_contract, human_presentation_contract, M2_02A_historical_next_action, state_version, next_action
+changed_fields: M2_02B_plan_acceptance, input_availability_check_authorized, state_version, next_action
 
 ## Approved goal
 
@@ -752,7 +752,7 @@ proposal_artifact:
 M2_02B_NATURAL_QUALITY_RELEVANCE_PROPOSAL.md
 
 proposal_status:
-REVISION_2 / PENDING_AI-B_REVIEW
+REVISION_2 / REVIEWED PASS / HUMAN ACCEPT_PLAN_ONLY
 
 execution_status:
 NOT_STARTED / BLOCKED_BY_INPUT
@@ -788,17 +788,16 @@ No M2-02B command has been executed.
 
 ## Next action
 
-AI-B independently reviews M2_02B_NATURAL_QUALITY_RELEVANCE_PROPOSAL.md revision 2.
+Inspect only already accessible sources for candidate native Air 3S material required by the accepted M2-02B plan.
 
-After review PASS, HUMAN may decide:
-- AUTHORIZE_M2_02B,
-- ACCEPT_PLAN_ONLY,
-- REQUEST_CHANGES,
-- DEFER.
+Return:
+- INPUT_READINESS if a complete candidate set is found; or
+- INPUT_GAP_REPORT if the set remains incomplete.
 
-Even if later authorized, M2-02B cannot start until the complete natural input set is supplied, matched-group admission is established and input is validated.
-
-Do not execute a flight or record new material under M2-02B authorization.
+Do not calculate metrics.
+Do not collect HUMAN labels.
+Do not execute a flight or record new material.
+Do not execute M2-02B.
 Do not execute BRISQUE, M2-03 or later work.
 Do not freeze architecture.
 
@@ -838,3 +837,50 @@ Revision-2 additions:
 
 No new metrics, crops, models, thresholds or execution authority were added.
 No M2-02B command has been executed.
+
+
+## M2-02B HUMAN plan decision
+
+decision_id:
+HUMAN-PLAN-DECISION-M2-02B-001
+
+source:
+HUMAN_EXPLICIT_ACCEPT_PLAN_ONLY
+
+accepted_subject_version:
+58be2e74fac96858dbf38ef134bc489614a023c4
+
+proposal_revision:
+2
+
+accepted_review:
+MP/m2-02b-proposal-review-002/AI-B
+
+review_verdict:
+PASS
+
+decision:
+ACCEPT_PLAN_ONLY
+
+execution_status:
+NOT_STARTED / BLOCKED_BY_INPUT
+
+execution_authorization:
+NOT_GRANTED
+
+input_status:
+NOT_ESTABLISHED
+
+availability_check:
+AUTHORIZED FOR ALREADY ACCESSIBLE SOURCES ONLY
+
+availability_check_does_not_authorize:
+- metrics,
+- HUMAN labeling,
+- flight,
+- new recording,
+- M2-02B execution.
+
+Important:
+the accepted M2-02B plan artifact remains exactly 58be2e74fac96858dbf38ef134bc489614a023c4.
+Later commits may record the HUMAN plan decision, editorial cleanup and input-availability evidence; they do not redefine the accepted plan.

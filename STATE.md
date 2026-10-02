@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 16
+state_version: 17
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_01_human_acceptance, M2_01_state_corrections, next_experiment_proposal, state_version, next_action
+changed_fields: M2_02A_proposal_revision_2, clipping_response_semantics, M2_01_historical_review_status, state_version, next_action
 
 ## Approved goal
 
@@ -236,7 +236,7 @@ execution_result:
 PASS
 
 review_status:
-PENDING_INDEPENDENT_REVIEW
+HISTORICAL — SUPERSEDED BY MP/m2-01-execution-review-001/AI-B PASS AND HUMAN ACCEPTANCE
 
 input:
 Air3s_normal.MP4
@@ -333,9 +333,9 @@ NOT AUTHORIZED
 
 ## Next action
 
-AI-B reviews M2_02A_QUALITY_SIGNAL_PROPOSAL.md.
+AI-B reviews M2_02A_QUALITY_SIGNAL_PROPOSAL.md revision 2.
 
-After proposal review, HUMAN decides whether to:
+After review PASS, HUMAN decides whether to:
 - AUTHORIZE_M2_02A,
 - ACCEPT_PLAN_ONLY,
 - REQUEST_CHANGES,
@@ -407,7 +407,7 @@ proposal_artifact:
 M2_02A_QUALITY_SIGNAL_PROPOSAL.md
 
 proposal_status:
-READY_FOR_REVIEW_AND_HUMAN_DECISION
+REVISION_2 / PENDING_AI-B_REVIEW
 
 execution_status:
 NOT_STARTED
@@ -442,3 +442,40 @@ Therefore M2-02A can only test deterministic directional sanity, not real-world 
 
 No quality threshold is proposed or accepted.
 No experiment has been executed under M2-02A.
+
+
+## M2-02A proposal review correction
+
+review_packet:
+MP/m2-02a-proposal-review-001/AI-B
+
+review_result:
+REQUEST_CHANGES
+
+proposal_revision:
+2
+
+execution_status:
+NOT_STARTED
+
+execution_authorization:
+NOT_GRANTED
+
+resolved_review_point:
+M2-02A-P01 — strict clipping inequality.
+
+Revision-2 semantics:
+- black_fraction(DARK_CLIP) and white_fraction(BRIGHT_CLIP) must not decrease;
+- strict increase records EXERCISED_CONFIRMED;
+- equality records CLIPPING_RESPONSE_NOT_EXERCISED;
+- lack of exercise is not a signal FAIL by itself;
+- overall full-hypothesis PASS requires both clipping signals to be exercised and confirmed at least once with no decreases;
+- if reproducibility / blur / mean-intensity checks are resolved but a clipping signal is never exercised, overall result is INCONCLUSIVE while resolved sub-results are preserved;
+- frozen ±96 transforms cannot be tuned after seeing results to force PASS.
+
+Non-blocking notes incorporated:
+- grayscale output is described as grayscale intensity, not physical luminance;
+- exact dtype conversions, GaussianBlur/Laplacian parameters, BORDER_DEFAULT and serialization/raw clipping counts are specified;
+- M2-01 historical review status is marked as superseded by PASS + HUMAN acceptance.
+
+No M2-02A command has been executed.

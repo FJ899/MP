@@ -281,3 +281,66 @@ Air3s_normal.MP4 supplied by HUMAN in current conversation.
 
 Next action:
 execute only M2-01 and return result for independent review.
+
+
+## D-027 — HUMAN accepts M2-01 execution result
+
+decision_id:
+HUMAN-ARTIFACT-DECISION-M2-01-001
+
+source:
+HUMAN_EXPLICIT_ACCEPT
+
+accepted_experiment:
+M2-01-20261001-AIR3S-NORMAL-001
+
+accepted_subject_version:
+58e138899829969a6dda5dced482b78c3343279a
+
+accepted_review:
+MP/m2-01-execution-review-001/AI-B
+
+review_verdict:
+PASS
+
+artifact_decision:
+ACCEPT
+
+acceptance_scope:
+PASS for timestamp/frame/pixel provenance on the specific supplied sample identified as Air 3S.
+
+Accepted evidence meaning:
+for that supplied file and tested runtime, the experiment reproducibly bound:
+source SHA-256 -> selected video stream -> decoded-frame ordinal -> raw PTS/timebase -> selected frame -> RGB24 pixels -> saved PNG evidence.
+
+This acceptance does NOT establish:
+- general compatibility of every DJI Air 3S recording mode, firmware or codec profile,
+- untouched-camera-original chain of custody,
+- telemetry compatibility,
+- quality-model validity,
+- detector validity,
+- CandidateEvent behavior,
+- 30-minute or end-to-end MP operation.
+
+Preserved limitations:
+- one short file / one recording profile,
+- no independent proof of untouched camera original,
+- telemetry NOT_TESTED,
+- BRISQUE default model provenance/terms UNRESOLVED,
+- PatchCore exact backbone identity/terms PRECONDITION,
+- known-defect checkpoint/license BLOCKED,
+- quality thresholds NOT_ACCEPTED,
+- CandidateEvent semantics OPEN HYPOTHESIS.
+
+This acceptance does NOT authorize:
+- M2-02 or later experiments,
+- dependency installation,
+- model training/execution beyond separately authorized scope,
+- repository implementation/adapters/orchestrator,
+- merge to main,
+- architecture freeze,
+- flight/route execution,
+- publish/release/deploy.
+
+Next action:
+prepare a separate smallest next quality-signal experiment proposal for review and HUMAN decision.

@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 23
+state_version: 24
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_02B_input_gap_report, available_material_inventory, input_status, editorial_masking_wording, state_version, next_action
+changed_fields: M2_02B_input_gap_report_002, expanded_material_inventory, potential_scene_clusters, input_status, state_version, next_action
 
 ## Approved goal
 
@@ -788,18 +788,21 @@ No M2-02B command has been executed.
 
 ## Next action
 
-HUMAN decides what to do with the M2-02B input gap.
+HUMAN decides what to do with the remaining M2-02B input gap.
 
-Current evidence does not justify M2-02B execution.
+Eight native candidate clips are now accessible, but no REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT role has been verified and no matched group has been admitted.
 
-Possible future actions require separate HUMAN choice:
-- provide already existing candidate native Air 3S files/segments;
-- identify another already existing accessible source;
-- defer M2-02B;
-- separately consider whether new acquisition is worth authorizing.
+A separate future HUMAN decision could authorize an INPUT_CLASSIFICATION_PRECHECK on these existing clips to inspect whether natural degradation segments plausibly exist.
+That precheck is NOT currently authorized.
+
+Other options:
+- provide additional already existing footage;
+- identify known condition/segment information for these files;
+- defer M2-02B.
 
 Do not calculate metrics.
 Do not collect HUMAN labels.
+Do not run formal midpoint-frame selection or matched admission.
 Do not execute a flight or record new material.
 Do not execute M2-02B.
 Do not execute BRISQUE, M2-03 or later work.
@@ -893,6 +896,9 @@ Later commits may record the HUMAN plan decision, editorial cleanup and input-av
 ## M2-02B input availability check
 
 report:
+M2_02B_INPUT_GAP_REPORT_002.md
+
+supersedes_availability_report:
 M2_02B_INPUT_GAP_REPORT_001.md
 
 report_type:
@@ -902,43 +908,53 @@ availability_check_scope:
 already accessible conversation files + Library search + currently mounted conversation working files only.
 
 accessible_native_video_found:
-Air3s_normal.MP4
+- Air3s_normal.MP4
+- Air3s_D-logM.MP4
+- Air3s_HLG.MP4
+- Coler_D-LogM_24mm.MP4
+- Coler_D-LogM_70mm.MP4
+- Coler_HDR.MP4
+- Slow_24mm_4K120fps.MP4
+- Slow_70mm_4K120fps.MP4
 
 accessible_native_video_count:
-1
+8
 
 accessible_video_identity:
 - size: 74451639 bytes
 - accepted M2-01 SHA-256: cc8ace8fc18280d09318d29f5b7dbcc1b7b44d986c2d83035d4421e0d927bcaa
 - role in M2-02B: POTENTIAL_REF_CANDIDATE / CONDITION_NOT_VERIFIED
 
-previously_declared_names_not_currently_accessible_as_video_bytes:
-- Air3s_D-logM
-- Air3s_HLG
-
 interpretation_boundary:
 recording-profile names do not establish NAT_DARK / NAT_BRIGHT / NAT_BLUR.
 
-availability_matrix_summary:
-- S1 REF: one available candidate only; not admitted
-- S1 NAT_BLUR: not found in checked accessible sources
-- S1 NAT_DARK: not found in checked accessible sources
-- S1 NAT_BRIGHT: not found in checked accessible sources
-- S2 all four conditions: not found in checked accessible sources
-- S3 all four conditions: not found in checked accessible sources
+embedded_preview_availability_observation:
+- candidate cluster A: indoor room — Air3s_normal / Air3s_D-logM / Air3s_HLG
+- candidate cluster B: waterfall wide ~24 mm — Coler_D-LogM_24mm / Coler_HDR / Slow_24mm_4K120fps
+- candidate cluster C: waterfall tele ~70 mm — Coler_D-LogM_70mm / Slow_70mm_4K120fps
 
-nominal_condition_slots:
-12
+preview_boundary:
+embedded preview inspection was used only for potential scene grouping.
+It was NOT formal midpoint-frame selection, matched admission, HUMAN labeling or metric execution.
 
-slots_with_accessible_candidate_file:
-1
+potential_scene_comparability:
+- indoor cluster: PROMISING / UNVERIFIED
+- waterfall wide cluster: PROMISING / UNVERIFIED
+- waterfall tele cluster: PARTIAL ONLY / UNVERIFIED
+- 24 mm vs 70 mm mixing: NOT SAFE TO ASSUME because visual scale differs materially
 
-slots_without_accessible_candidate_file:
-11
+condition_role_status:
+REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT remain unverified for all current files.
+
+complete_four_condition_verified_groups:
+0
+
+matched_group_admission:
+NOT_RUN
 
 important:
-the one accessible candidate is not yet a verified/admitted REF.
-No complete four-condition scene group exists in checked sources.
+new uploads substantially reduce file availability uncertainty but do not establish the required natural degradation roles.
+No complete verified matched group exists yet.
 
 matched_group_admission:
 NOT_RUN
@@ -956,7 +972,7 @@ input_readiness:
 NO
 
 input_gap:
-YES
+YES — CONDITION CLASSIFICATION / MATCHED-GROUP CONTRACT NOT ESTABLISHED
 
 search_limitation:
 NOT_FOUND_IN_CHECKED_SOURCES does not mean the material does not exist elsewhere.

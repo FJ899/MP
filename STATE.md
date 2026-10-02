@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 15
+state_version: 16
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_01_execution_result, M2_01_evidence, execution_incidents, review_status, state_version, next_action
+changed_fields: M2_01_human_acceptance, M2_01_state_corrections, next_experiment_proposal, state_version, next_action
 
 ## Approved goal
 
@@ -66,13 +66,13 @@ Commits after that version record the HUMAN decision and prepare transition plan
 ## Current phase
 
 current_phase:
-M2 TRANSITION — PROPOSAL ONLY
+M2 — M2-01 ACCEPTED / NEXT EXPERIMENT PROPOSAL ONLY
 
 MP Architecture v0.1:
 NOT READY TO FREEZE / NOT AUTHORIZED TO FREEZE
 
 M2_01:
-EXECUTED / RESULT_PASS / PENDING_INDEPENDENT_REVIEW
+HUMAN_ACCEPTED / PASS_FOR_SUPPLIED_SAMPLE
 
 M2_execution:
 NOT AUTHORIZED
@@ -162,10 +162,10 @@ NOT REQUIRED.
 - BRISQUE default model provenance/terms: UNRESOLVED.
 - PatchCore exact backbone identity/terms: PRECONDITION.
 - known-defect checkpoint/license: BLOCKED.
-- Air 3S compatibility: NOT_TESTED.
+- M2-01 timestamp/frame provenance: TESTED / PASS for the specific supplied sample identified as Air 3S; general Air 3S compatibility: NOT_ESTABLISHED.
 - quality thresholds: NOT_ACCEPTED.
 - CandidateEvent integration semantics: OPEN HYPOTHESIS.
-- M2 runtime evidence: NOT_RUN.
+- M2-01 runtime evidence: PASS and HUMAN_ACCEPTED; all other M2 experiments: NOT_RUN.
 - MP end-to-end: NOT_BUILT / NOT_RUN.
 
 ## M2-01 proposal review
@@ -333,6 +333,112 @@ NOT AUTHORIZED
 
 ## Next action
 
-AI-B independently reviews M2-01 execution evidence.
+AI-B reviews M2_02A_QUALITY_SIGNAL_PROPOSAL.md.
 
-Do not begin M2-02 or modify architecture before review and subsequent HUMAN decision.
+After proposal review, HUMAN decides whether to:
+- AUTHORIZE_M2_02A,
+- ACCEPT_PLAN_ONLY,
+- REQUEST_CHANGES,
+- DEFER.
+
+Do not execute M2-02A, BRISQUE, M2-03 or later work without separate HUMAN authorization.
+Do not freeze architecture.
+
+
+## M2-01 artifact decision
+
+decision_id:
+HUMAN-ARTIFACT-DECISION-M2-01-001
+
+source:
+HUMAN_EXPLICIT_ACCEPT
+
+accepted_experiment:
+M2-01-20261001-AIR3S-NORMAL-001
+
+accepted_subject_version:
+58e138899829969a6dda5dced482b78c3343279a
+
+accepted_review:
+MP/m2-01-execution-review-001/AI-B
+
+accepted_review_verdict:
+PASS
+
+artifact_decision:
+ACCEPT
+
+acceptance_scope:
+PASS for timestamp/frame/pixel provenance on the specific supplied sample identified as Air 3S.
+
+Accepted meaning:
+source SHA-256 -> selected stream -> decoded-frame ordinal -> raw PTS/timebase -> selected frame -> RGB24 pixels -> saved PNG evidence was reproducible for the tested file/profile/runtime.
+
+General Air 3S compatibility:
+NOT_ESTABLISHED.
+
+Other M2 runtime:
+NOT_RUN.
+
+Important:
+the accepted M2-01 result artifact remains exactly 58e138899829969a6dda5dced482b78c3343279a.
+Later commits only record HUMAN acceptance and prepare a separate proposal.
+
+Non-authorizations remain:
+- M2-02/M2-02A execution NOT AUTHORIZED,
+- dependency installation NOT AUTHORIZED,
+- model execution/training NOT AUTHORIZED unless separately approved,
+- implementation/adapters/orchestrator NOT AUTHORIZED,
+- merge NOT AUTHORIZED,
+- architecture freeze NOT AUTHORIZED,
+- flight/route execution NOT AUTHORIZED,
+- publish/release/deploy NOT AUTHORIZED.
+
+
+## Next experiment proposal
+
+proposal_id:
+M2-02A
+
+name:
+Model-Free Quality Signal Sanity Check
+
+proposal_artifact:
+M2_02A_QUALITY_SIGNAL_PROPOSAL.md
+
+proposal_status:
+READY_FOR_REVIEW_AND_HUMAN_DECISION
+
+execution_status:
+NOT_STARTED
+
+execution_authorization:
+NOT_GRANTED
+
+BRISQUE branch:
+BLOCKED_BY_MODEL_ARTIFACT_TERMS
+
+BRISQUE unresolved artifacts:
+- brisque/models/svm.txt
+- brisque/models/normalize.pickle
+
+Proposed alternative:
+use already available OpenCV/NumPy only, with no pretrained model and no new installation, to test directional sanity of:
+- Laplacian variance for controlled blur,
+- mean luma,
+- black clipping fraction,
+- white clipping fraction
+
+on three provenance-anchored frames and deterministic synthetic stress variants.
+
+Available runtime observed during proposal preparation:
+- Python 3.13.5
+- opencv-python 4.13.0.92
+- NumPy 2.3.5
+
+Important input gap:
+no reviewed naturally degraded Air 3S frame set with human quality labels is available.
+Therefore M2-02A can only test deterministic directional sanity, not real-world threshold/classification performance.
+
+No quality threshold is proposed or accepted.
+No experiment has been executed under M2-02A.

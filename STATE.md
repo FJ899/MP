@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 22
+state_version: 23
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_02B_plan_acceptance, input_availability_check_authorized, state_version, next_action
+changed_fields: M2_02B_input_gap_report, available_material_inventory, input_status, editorial_masking_wording, state_version, next_action
 
 ## Approved goal
 
@@ -788,11 +788,15 @@ No M2-02B command has been executed.
 
 ## Next action
 
-Inspect only already accessible sources for candidate native Air 3S material required by the accepted M2-02B plan.
+HUMAN decides what to do with the M2-02B input gap.
 
-Return:
-- INPUT_READINESS if a complete candidate set is found; or
-- INPUT_GAP_REPORT if the set remains incomplete.
+Current evidence does not justify M2-02B execution.
+
+Possible future actions require separate HUMAN choice:
+- provide already existing candidate native Air 3S files/segments;
+- identify another already existing accessible source;
+- defer M2-02B;
+- separately consider whether new acquisition is worth authorizing.
 
 Do not calculate metrics.
 Do not collect HUMAN labels.
@@ -869,7 +873,7 @@ execution_authorization:
 NOT_GRANTED
 
 input_status:
-NOT_ESTABLISHED
+INCOMPLETE / INPUT_GAP_CONFIRMED IN CHECKED ACCESSIBLE SOURCES
 
 availability_check:
 AUTHORIZED FOR ALREADY ACCESSIBLE SOURCES ONLY
@@ -884,3 +888,79 @@ availability_check_does_not_authorize:
 Important:
 the accepted M2-02B plan artifact remains exactly 58be2e74fac96858dbf38ef134bc489614a023c4.
 Later commits may record the HUMAN plan decision, editorial cleanup and input-availability evidence; they do not redefine the accepted plan.
+
+
+## M2-02B input availability check
+
+report:
+M2_02B_INPUT_GAP_REPORT_001.md
+
+report_type:
+INPUT_GAP_REPORT
+
+availability_check_scope:
+already accessible conversation files + Library search + currently mounted conversation working files only.
+
+accessible_native_video_found:
+Air3s_normal.MP4
+
+accessible_native_video_count:
+1
+
+accessible_video_identity:
+- size: 74451639 bytes
+- accepted M2-01 SHA-256: cc8ace8fc18280d09318d29f5b7dbcc1b7b44d986c2d83035d4421e0d927bcaa
+- role in M2-02B: POTENTIAL_REF_CANDIDATE / CONDITION_NOT_VERIFIED
+
+previously_declared_names_not_currently_accessible_as_video_bytes:
+- Air3s_D-logM
+- Air3s_HLG
+
+interpretation_boundary:
+recording-profile names do not establish NAT_DARK / NAT_BRIGHT / NAT_BLUR.
+
+availability_matrix_summary:
+- S1 REF: one available candidate only; not admitted
+- S1 NAT_BLUR: not found in checked accessible sources
+- S1 NAT_DARK: not found in checked accessible sources
+- S1 NAT_BRIGHT: not found in checked accessible sources
+- S2 all four conditions: not found in checked accessible sources
+- S3 all four conditions: not found in checked accessible sources
+
+nominal_condition_slots:
+12
+
+slots_with_accessible_candidate_file:
+1
+
+slots_without_accessible_candidate_file:
+11
+
+important:
+the one accessible candidate is not yet a verified/admitted REF.
+No complete four-condition scene group exists in checked sources.
+
+matched_group_admission:
+NOT_RUN
+
+human_labeling:
+NOT_RUN
+
+metrics:
+NOT_RUN
+
+execution:
+NOT_STARTED / BLOCKED_BY_INPUT
+
+input_readiness:
+NO
+
+input_gap:
+YES
+
+search_limitation:
+NOT_FOUND_IN_CHECKED_SOURCES does not mean the material does not exist elsewhere.
+
+editorial_cleanup:
+post-acceptance wording in M2_02B_NATURAL_QUALITY_RELEVANCE_PROPOSAL.md changed from "HUMAN blind review" to "HUMAN masked-condition review".
+This editorial commit does not redefine the accepted plan subject 58be2e74fac96858dbf38ef134bc489614a023c4.

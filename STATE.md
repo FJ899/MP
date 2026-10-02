@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 18
+state_version: 19
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_02A_human_authorization, execution_status, state_version, next_action
+changed_fields: M2_02A_execution_result, M2_02A_evidence, review_status, state_version, next_action
 
 ## Approved goal
 
@@ -66,7 +66,7 @@ Commits after that version record the HUMAN decision and prepare transition plan
 ## Current phase
 
 current_phase:
-M2 — M2-01 ACCEPTED / NEXT EXPERIMENT PROPOSAL ONLY
+M2 — M2-01 ACCEPTED / M2-02A EXECUTED / REVIEW PENDING
 
 MP Architecture v0.1:
 NOT READY TO FREEZE / NOT AUTHORIZED TO FREEZE
@@ -75,7 +75,7 @@ M2_01:
 HUMAN_ACCEPTED / PASS_FOR_SUPPLIED_SAMPLE
 
 M2_execution:
-NOT AUTHORIZED
+M2-02A EXECUTED UNDER HUMAN-M2-02A-AUTH-001; M2-03+ NOT AUTHORIZED
 
 dependency_installation:
 NOT AUTHORIZED
@@ -333,13 +333,10 @@ NOT AUTHORIZED
 
 ## Next action
 
-Execute exactly M2-02A revision 2 under HUMAN-M2-02A-AUTH-001.
+AI-B independently reviews M2-02A execution evidence.
 
-After execution:
-- record PASS / FAIL / INCONCLUSIVE,
-- preserve compact evidence,
-- submit the result to AI-B for independent review,
-- stop.
+After review:
+HUMAN decides whether to ACCEPT / REQUEST_CHANGES / DEFER the M2-02A result.
 
 Do not execute BRISQUE, M2-03 or later work.
 Do not freeze architecture.
@@ -520,3 +517,162 @@ Preserved non-authorizations:
 - architecture freeze,
 - flight/route execution,
 - publish/release/deploy.
+
+
+## M2-02A execution result
+
+experiment_id:
+M2-02A-20261002-AIR3S-QUALITY-001
+
+proposal_revision:
+2
+
+authorized_subject_version:
+0fdebf44fc5241163f6dee47fcb189e07c5a9586
+
+authorization_decision:
+HUMAN-M2-02A-AUTH-001
+
+execution_result:
+PASS
+
+review_status:
+PENDING_INDEPENDENT_REVIEW
+
+result_acceptance:
+PENDING HUMAN ARTIFACT DECISION AFTER REVIEW
+
+source:
+Air3s_normal.MP4
+
+source_sha256:
+cc8ace8fc18280d09318d29f5b7dbcc1b7b44d986c2d83035d4421e0d927bcaa
+
+source_frames:
+- p10 ordinal 34 / raw PTS 34034
+- p50 ordinal 168 / raw PTS 168168
+- p90 ordinal 302 / raw PTS 302302
+
+source_reconstruction:
+Run A and Run B source RGB24 hashes match accepted M2-01 hashes for all three frames.
+
+runtime:
+- Python 3.13.5
+- OpenCV 4.13.0
+- NumPy 2.3.5
+- FFmpeg 7.1.5-0+deb13u1
+
+installation:
+NONE
+
+pretrained_models:
+NONE
+
+frozen_transforms:
+- ORIGINAL
+- BLUR_SIGMA4
+- DARK_MINUS96
+- BRIGHT_PLUS96
+
+complete_runs:
+2
+
+states_per_run:
+12
+
+formal_run_status:
+Run A = 0 / Run B = 0
+
+reproducibility:
+zero field differences across corresponding Run A/B rows after excluding run_id.
+
+blur_result:
+PASS on p10 / p50 / p90.
+
+dark_mean_gray_result:
+PASS on p10 / p50 / p90.
+
+bright_mean_gray_result:
+PASS on p10 / p50 / p90.
+
+black_fraction_direction:
+NO DECREASE on all tested frames.
+
+black_clipping_response:
+EXERCISED_CONFIRMED on p10 / p50 / p90.
+
+white_fraction_direction:
+NO DECREASE on all tested frames.
+
+white_clipping_response:
+EXERCISED_CONFIRMED on p10 / p50 / p90.
+
+provenance:
+PASS.
+
+result_interpretation:
+The selected classical metrics are deterministic on these tested inputs and move in the expected direction under the three frozen controlled transformations while preserving M2-01 provenance.
+
+result_does_not_establish:
+- natural good/bad Air 3S quality discrimination,
+- operator usefulness,
+- production thresholds,
+- false-positive / false-negative performance,
+- production quality gate,
+- equivalence of synthetic transformations to natural capture failures,
+- superiority over BRISQUE.
+
+repository_evidence:
+- evidence/m2-02a/M2-02A-20261002-AIR3S-QUALITY-001/RESULT.md
+- evidence/m2-02a/M2-02A-20261002-AIR3S-QUALITY-001/metrics_runA.csv
+- evidence/m2-02a/M2-02A-20261002-AIR3S-QUALITY-001/metrics_runB.csv
+- evidence/m2-02a/M2-02A-20261002-AIR3S-QUALITY-001/commands_or_transient_script.txt
+- evidence/m2-02a/M2-02A-20261002-AIR3S-QUALITY-001/comparison_summary.txt
+
+compact_archive_sha256:
+ce7dd15f684c9032648d2d0788d98ca102b4d132f59a0b3cefd998b95d8d7b52
+
+## Authorization after M2-02A
+
+BRISQUE:
+NOT AUTHORIZED / BLOCKED_BY_MODEL_ARTIFACT_TERMS
+
+M2-03:
+NOT AUTHORIZED
+
+dependency installation:
+NOT AUTHORIZED
+
+pretrained models:
+NOT AUTHORIZED
+
+training:
+NOT AUTHORIZED
+
+production thresholds:
+NOT AUTHORIZED
+
+quality-gate implementation:
+NOT AUTHORIZED
+
+BUILD orchestrator:
+NOT AUTHORIZED
+
+merge:
+NOT AUTHORIZED
+
+architecture freeze:
+NOT AUTHORIZED
+
+flight/route:
+NOT AUTHORIZED
+
+publish/release/deploy:
+NOT AUTHORIZED
+
+## M2-02A next action
+
+AI-B independently reviews the M2-02A execution evidence.
+
+Do not start another experiment automatically.
+Do not create a production quality gate.

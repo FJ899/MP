@@ -344,3 +344,66 @@ This acceptance does NOT authorize:
 
 Next action:
 prepare a separate smallest next quality-signal experiment proposal for review and HUMAN decision.
+
+
+## D-028 — HUMAN authorizes M2-02A Model-Free Quality Signal Sanity Check
+
+decision_id:
+HUMAN-M2-02A-AUTH-001
+
+source:
+HUMAN_EXPLICIT_AUTHORIZE_M2_02A
+
+authorized_subject_version:
+0fdebf44fc5241163f6dee47fcb189e07c5a9586
+
+proposal_revision:
+2
+
+review_reference:
+MP/m2-02a-proposal-review-002/AI-B
+
+review_verdict:
+PASS
+
+authorization_scope:
+Execute exactly M2-02A revision 2.
+
+Permitted:
+- reconstruct accepted M2-01 frames p10 / p50 / p90 from the accepted source;
+- generate ORIGINAL / BLUR_SIGMA4 / DARK_MINUS96 / BRIGHT_PLUS96 states;
+- run exactly two complete deterministic passes;
+- calculate only Laplacian variance, mean_gray_intensity, black_fraction and white_fraction;
+- preserve source/frame provenance, source/derived RGB24 SHA-256, dimensions, runtime versions, raw clipping counts and metric values;
+- apply frozen dtype/filter/border/serialization contract;
+- create compact evidence;
+- return PASS / FAIL / INCONCLUSIVE.
+
+Clipping semantics:
+- no decrease is required;
+- strict increase = EXERCISED_CONFIRMED;
+- equality = CLIPPING_RESPONSE_NOT_EXERCISED;
+- lack of clipping exercise is not an independent FAIL;
+- full PASS requires both black and white clipping signals to be exercised at least once, with no decreases;
+- parameters must not be tuned after observing results.
+
+Explicitly not authorized:
+- BRISQUE,
+- dependency installation,
+- pretrained models,
+- model training,
+- production threshold selection,
+- quality-gate implementation,
+- M2-03 or later experiments,
+- BUILD orchestrator,
+- merge to main,
+- architecture freeze,
+- flight/route execution,
+- publish/release/deploy.
+
+Result acceptance:
+not included.
+A later HUMAN artifact decision is required after independent review.
+
+Next action:
+execute only M2-02A revision 2 and stop after producing the review candidate.

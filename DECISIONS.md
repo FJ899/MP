@@ -539,3 +539,52 @@ It does NOT authorize:
 
 Next action:
 inspect only already available sources for candidate native Air 3S material and report INPUT_READINESS or INPUT_GAP_REPORT.
+
+
+## D-031 — HUMAN authorizes INPUT_CLASSIFICATION_PRECHECK for M2-02B
+
+decision_id:
+HUMAN-M2-02B-INPUT-CLASSIFICATION-PRECHECK-AUTH-001
+
+source:
+HUMAN_EXPLICIT_AUTHORIZE_INPUT_CLASSIFICATION_PRECHECK
+
+authorization_context_subject:
+ea3ffdd425197762490dca4cbcfbdcf85bf5c305
+
+authorized_action:
+INPUT_CLASSIFICATION_PRECHECK on already accessible existing material only.
+
+scope:
+- inspect already accessible Air 3S native video files and associated existing still/raw material;
+- identify plausible scene clusters and candidate REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT roles;
+- inspect file/container metadata and representative visual samples only as needed for classification;
+- report whether any complete plausible four-condition matched set exists;
+- preserve uncertainty between AVAILABLE, DECLARED_BUT_UNVERIFIED, POTENTIAL_SCENE_MATCH, MISSING and NOT_ESTABLISHED;
+- prepare INPUT_READINESS or INPUT_GAP_REPORT.
+
+explicitly_not_authorized:
+- M2-02B execution;
+- metric calculation;
+- HUMAN quality labeling;
+- formal matched-group admission;
+- formal midpoint-frame selection for the experiment;
+- parameter tuning;
+- BRISQUE;
+- dependency installation;
+- pretrained models;
+- training;
+- flight or route execution;
+- recording new material;
+- M2-03+;
+- BUILD orchestrator;
+- merge to main;
+- architecture freeze;
+- publish/release/deploy.
+
+result_acceptance:
+not included.
+Any later M2-02B execution still requires a separate HUMAN authorization.
+
+stop_rule:
+stop after the classification precheck and return the resulting readiness/gap packet.

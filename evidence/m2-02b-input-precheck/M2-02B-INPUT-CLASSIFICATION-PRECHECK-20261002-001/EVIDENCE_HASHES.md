@@ -15,3 +15,10 @@ Local working-evidence SHA-256 values:
 
 Note:
 The contact sheet and exact command log were retained in the working evidence package. The repository stores the audit summary, inventories, statuses, incident record and these hashes; the precheck is not M2-02B execution.
+
+
+Compact working evidence archive:
+- M2-02B-input-classification-precheck-compact.tar.gz
+- SHA-256: 3e4e8bb5317371f6e0bb0403209e2cb231b97ae998a5713e3316abf1473d1def
+
+The compact archive is a conversation/working artifact and is not committed as binary repository content.

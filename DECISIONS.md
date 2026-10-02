@@ -477,3 +477,65 @@ This acceptance does NOT authorize:
 Next action:
 prepare a separate proposal for the smallest useful natural-degradation Air 3S test with HUMAN quality judgment.
 Do not execute it without separate HUMAN authorization.
+
+
+## D-030 — HUMAN accepts M2-02B revision 2 plan only
+
+decision_id:
+HUMAN-PLAN-DECISION-M2-02B-001
+
+source:
+HUMAN_EXPLICIT_ACCEPT_PLAN_ONLY
+
+accepted_proposal:
+M2-02B — Natural Quality Relevance Pilot
+
+accepted_subject_version:
+58be2e74fac96858dbf38ef134bc489614a023c4
+
+proposal_revision:
+2
+
+accepted_review:
+MP/m2-02b-proposal-review-002/AI-B
+
+review_verdict:
+PASS
+
+decision:
+ACCEPT_PLAN_ONLY
+
+acceptance_scope:
+Accept the construction of M2-02B revision 2, including scene contracts, matched-group admission, INPUT_MATCH_INVALID, HUMAN_DEGRADATION_NOT_EXERCISED, deterministic midpoint-frame selection, masked-condition HUMAN review, frozen HUMAN labels before metric disclosure, inherited M2-02A calculation contract, family-level support semantics, overall PASS / FAIL / INCONCLUSIVE, provenance and evidence requirements.
+
+Execution status:
+NOT_STARTED / BLOCKED_BY_INPUT.
+
+Execution authorization:
+NOT_GRANTED.
+
+Input status:
+NOT_ESTABLISHED.
+
+This decision authorizes only an availability check of already accessible Air 3S material.
+
+It does NOT authorize:
+- M2-02B execution,
+- HUMAN labeling,
+- metric calculation,
+- flight or route execution,
+- recording new footage,
+- BRISQUE,
+- dependency installation,
+- pretrained models,
+- training,
+- production thresholds,
+- quality-gate implementation,
+- M2-03+,
+- BUILD orchestrator,
+- merge to main,
+- architecture freeze,
+- publish/release/deploy.
+
+Next action:
+inspect only already available sources for candidate native Air 3S material and report INPUT_READINESS or INPUT_GAP_REPORT.

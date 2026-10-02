@@ -1,7 +1,7 @@
 # Next Experiment Proposal — M2-02B Natural Quality Relevance Pilot
 
 status:
-PROPOSED_FOR_REVIEW_AND_HUMAN_DECISION
+REVISION_2 / PROPOSED_FOR_REVIEW_AND_HUMAN_DECISION
 
 experiment_id:
 M2-02B
@@ -101,6 +101,74 @@ Preferred:
 - native unedited MP4;
 - no social-media/export/transcode copy.
 
+## Scene contract and matched-group admission
+
+Before HUMAN labeling and before any metric calculation or disclosure, create a frozen scene contract for each S1 / S2 / S3.
+
+Required fields per scene:
+
+- scene_id;
+- concrete physical surface/object being inspected;
+- inspection_question: the same inspection purpose for REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT;
+- detail_type_to_judge: a plain-language description of the type of visual detail whose visibility matters for that inspection question;
+- declared source clips/segments for all four conditions;
+- relevant visible-content differences between the four selected midpoint frames;
+- matched_group_admission:
+  - ADMIT
+  - INPUT_MATCH_INVALID
+- admission_rationale.
+
+A known true defect label is NOT required.
+
+The contract must answer, in practical terms:
+
+"Are all four frames asking the HUMAN to judge the same inspection task on the same physical surface/object at a comparable visual scale?"
+
+### Matched-group admission criteria
+
+ADMIT only when, before metrics are viewed:
+
+1. the same physical surface/object is visible in all four conditions;
+
+2. the same inspection_question applies to all four frames;
+
+3. the same detail_type_to_judge is relevant to all four frames;
+
+4. the visual scale of the detail is comparable enough that a change in HUMAN usability can reasonably be attributed to capture quality rather than a materially different object scale;
+
+5. viewpoint and frame content are comparable enough that the same region/task can be assessed in all four frames;
+
+6. material differences that may affect comparability are explicitly recorded.
+
+No arbitrary numeric geometric tolerance is required for this pilot.
+
+The admission decision is a documented HUMAN/experiment-design control made before metric inspection.
+
+### INPUT_MATCH_INVALID
+
+If the matched-group criteria are not met, record:
+
+INPUT_MATCH_INVALID
+
+This is distinct from:
+
+HUMAN_DEGRADATION_NOT_EXERCISED.
+
+INPUT_MATCH_INVALID means the comparison itself is not interpretable because the scene/task pairing is not sufficiently comparable.
+
+It must NOT:
+- count as evidence against the metric;
+- count as an ordinary non-exercised degradation;
+- be silently replaced after metric inspection by another frame.
+
+If INPUT_MATCH_INVALID is discovered after authorized execution has started:
+- preserve the invalidity evidence and rationale;
+- exclude the invalid pair/group from directional support counting;
+- mark the affected degradation family INCONCLUSIVE if fewer than two valid HUMAN_EXERCISED matched pairs remain;
+- preserve all unaffected family sub-results.
+
+Do not select replacement material after metric inspection to manufacture interpretability.
+
 ## Input boundary
 
 No reviewed natural-degradation dataset is assumed to exist now.
@@ -146,16 +214,57 @@ Do not search nearby frames for a more favorable metric outcome.
 
 HUMAN labels must be frozen BEFORE metric calculation is revealed.
 
-The 12 selected frames are presented to HUMAN under deterministic masked IDs:
+Only frames from ADMITTED matched groups enter the HUMAN review set.
 
-Q01 ... Q12
+### Presentation contract
 
-The visible review must not expose:
-- REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT labels;
+The HUMAN receives the same inspection-task information for every frame in a given scene:
+
+- scene_id masked from condition identity;
+- inspection_question;
+- detail_type_to_judge.
+
+The HUMAN may know what inspection task is being judged.
+
+The HUMAN must NOT see:
+- REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT condition labels;
+- source filenames;
+- source folder names or metadata that reveal condition;
 - metric values;
 - metric-derived ranking.
 
-The mapping from Q-ID to source condition is preserved in evidence but hidden during labeling.
+All frames must be reviewed using the same presentation method:
+
+- same viewer and display/session where practical;
+- full-resolution source frame available;
+- initial view: full frame fit-to-window;
+- allowed detail inspection: native 100% zoom with pan;
+- no sharpening, denoise, contrast enhancement, super-resolution or other image enhancement;
+- no crop-only presentation that hides context;
+- the same zoom/pan capabilities for every reviewed frame.
+
+Record the presentation contract in evidence.
+
+### Masking and order
+
+Before HUMAN labeling:
+
+1. create Q01...Q12 masked IDs;
+2. create a fixed permutation independent of metric values;
+3. save the Q-ID -> source/condition mapping separately;
+4. hide filenames and condition-revealing metadata from the review surface;
+5. hash/freeze the masked review order before labels are collected.
+
+The permutation may be generated deterministically from a predeclared seed or by another predeclared method, but it must be fixed before metric results are available.
+
+If HUMAN previously participated in capturing or organizing the source material and may recognize specific clips/scenes:
+
+record:
+MASKING_LIMITATION_KNOWN_SOURCE_FAMILIARITY
+
+Do not describe that review as fully blind.
+
+The review remains usable as a masked-condition pilot, with that limitation preserved.
 
 ### HUMAN question
 
@@ -231,9 +340,22 @@ UNUSABLE = 0
 The score is an analysis encoding only.
 It is not a production threshold.
 
+## Pair validity before HUMAN exercise
+
+A pair can reach HUMAN_EXERCISED only if its scene contract is:
+
+matched_group_admission = ADMIT
+
+If the pair/group is INPUT_MATCH_INVALID:
+
+pair_status:
+INPUT_MATCH_INVALID
+
+Do not evaluate HUMAN_EXERCISED for that pair.
+
 ## HUMAN exercise rule
 
-A pair is HUMAN_EXERCISED for its intended degradation only when:
+For a valid admitted pair, it is HUMAN_EXERCISED for its intended degradation only when:
 
 1. HUMAN usability score(REF) > usability score(DEGRADED)
 
@@ -261,7 +383,7 @@ Do not relabel or select another frame after metric inspection to manufacture an
 
 ## Metrics
 
-Use the same model-free measurements as M2-02A.
+Use the same model-free measurements and calculation contract as M2-02A revision 2.
 
 Runtime candidate:
 - existing OpenCV;
@@ -270,6 +392,42 @@ Runtime candidate:
 
 No new installation.
 No pretrained model.
+
+### Frozen calculation contract carried from M2-02A revision 2
+
+Source frame:
+- RGB24 uint8;
+- shape H x W x 3.
+
+Grayscale:
+- cv2.cvtColor(rgb_uint8, cv2.COLOR_RGB2GRAY);
+- uint8 grayscale intensity, not physical luminance.
+
+Laplacian:
+- cv2.Laplacian(
+    gray_uint8,
+    cv2.CV_64F,
+    ksize=1,
+    borderType=cv2.BORDER_DEFAULT
+  );
+- variance computed in float64.
+
+mean_gray_intensity:
+- float64 mean of the grayscale image.
+
+black clipping support:
+- raw black_count = count(gray <= 5);
+- black_fraction = black_count / pixel_count.
+
+white clipping support:
+- raw white_count = count(gray >= 250);
+- white_fraction = white_count / pixel_count.
+
+Serialization:
+- preserve raw integer counts and pixel_count;
+- preserve float metrics with stable machine-readable precision sufficient for round-trip comparison in the same recorded runtime.
+
+Any transient script must record its SHA-256 and exact runtime versions.
 
 ### blur primary signal
 
@@ -343,18 +501,33 @@ This explicitly carries forward the evidence-practice correction from M2-02A rev
 
 ## Per-family support result
 
+Only pairs that are both:
+- matched_group_admission = ADMIT; and
+- HUMAN_EXERCISED
+
+may count toward directional family support.
+
+INPUT_MATCH_INVALID pairs never count as metric evidence.
+
 A degradation family is interpretable only if at least:
 
-2 of its 3 matched pairs
+2 of its 3 planned matched pairs
 
-are HUMAN_EXERCISED.
+remain valid and HUMAN_EXERCISED.
 
 If fewer than 2 are exercised:
 
 family_result:
 INCONCLUSIVE
 
-because the natural input did not provide enough HUMAN-confirmed examples of that degradation.
+because the natural input did not provide enough valid HUMAN-confirmed examples of that degradation.
+
+This can occur because of:
+- HUMAN_DEGRADATION_NOT_EXERCISED;
+- INPUT_MATCH_INVALID;
+- or a mixture of both.
+
+Preserve these causes separately.
 
 For an interpretable family:
 
@@ -393,6 +566,10 @@ INCONCLUSIVE:
 - but at least one required family is INCONCLUSIVE because insufficient HUMAN-confirmed natural degradation was exercised.
 
 Procedure/input/runtime failures after an authorized start may also produce INCONCLUSIVE if fair interpretation cannot be completed.
+
+INPUT_MATCH_INVALID handling:
+- if it leaves a family with fewer than two valid HUMAN_EXERCISED pairs, that family is INCONCLUSIVE;
+- unaffected families retain their own resolved results.
 
 ## Interpretation boundary
 
@@ -452,7 +629,12 @@ evidence/m2-02b/<experiment-id>/
 - command_statuses.txt
 - relevant_stdout_stderr/
 - frame_selection.csv
+- scene_contracts.csv
+- matched_group_admission.csv
+- presentation_contract.txt
 - masked_review_order.csv
+- masked_review_order_sha256.txt
+- masking_limitations.txt
 - human_labels_v1.csv
 - human_labels_v1_sha256.txt
 - metrics_runA.csv
@@ -488,8 +670,10 @@ Main cost:
 
 Would authorize only:
 - validation of already supplied native input clips/segments;
+- creation and freeze of scene contracts and matched-group admission decisions before metrics;
 - deterministic midpoint-frame selection;
-- creation of the 12-frame masked HUMAN review set;
+- creation of a fixed-permutation masked HUMAN review set with filenames/condition cues hidden;
+- use of the frozen presentation contract;
 - collection and freezing of HUMAN quality labels;
 - two repeated calculations of the same four model-free metrics;
 - matched-pair directional analysis;
@@ -540,3 +724,23 @@ BRISQUE:
 BLOCKED_BY_MODEL_ARTIFACT_TERMS
 
 No M2-02B command has been executed.
+
+## Review correction history
+
+Revision 2 incorporates AI-B review MP/m2-02b-proposal-review-001/AI-B.
+
+Resolved finding:
+M2-02B-P01 — insufficiently specified input comparability and inspection usefulness.
+
+Revision 2 adds:
+- scene-specific inspection_question and detail_type_to_judge;
+- explicit matched-group admission before metrics;
+- INPUT_MATCH_INVALID distinct from HUMAN_DEGRADATION_NOT_EXERCISED;
+- family-level INCONCLUSIVE handling when invalid input prevents enough valid exercised pairs;
+- uniform HUMAN presentation contract with full-resolution/native-100% access and no image enhancement;
+- fixed pre-label permutation independent of metrics;
+- hidden filenames/condition metadata;
+- explicit masking limitation when HUMAN knows the source material;
+- the exact M2-02A revision-2 RGB24 / RGB2GRAY / Laplacian / float64 / raw-count calculation contract.
+
+No new metric, crop, model or production threshold was added.

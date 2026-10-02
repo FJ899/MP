@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 26
+state_version: 27
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_02B_input_classification_precheck_result, expanded_native_video_inventory, DNG_ancillary_inventory, input_status, state_version, next_action
+changed_fields: M2_02B_input_classification_precheck_result, expanded_native_video_inventory, DNG_ancillary_inventory, compact_evidence_hash, input_status, state_version, next_action
 
 ## Approved goal
 
@@ -936,6 +936,12 @@ not_authorized:
 
 result_report:
 M2_02B_INPUT_GAP_REPORT_003.md
+
+compact_evidence_archive:
+M2-02B-input-classification-precheck-compact.tar.gz
+
+compact_evidence_archive_sha256:
+3e4e8bb5317371f6e0bb0403209e2cb231b97ae998a5713e3316abf1473d1def
 
 precheck_id:
 M2-02B-INPUT-CLASSIFICATION-PRECHECK-20261002-001

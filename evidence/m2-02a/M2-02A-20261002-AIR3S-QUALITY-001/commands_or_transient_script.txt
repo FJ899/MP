@@ -1,0 +1,134 @@
+import argparse, csv, hashlib, json
+from pathlib import Path
+import cv2
+import numpy as np
+
+WIDTH=3840
+HEIGHT=2160
+PIXELS=WIDTH*HEIGHT
+FRAME_BYTES=PIXELS*3
+SOURCE_META={
+    'p10': {'stream_index':0,'enumeration_ordinal':34,'raw_pts':34034,'pts_time':'1.134467','time_base':'1/30000','accepted_hash':'0d93db5b47abe64cff7ac5bd1655c1a152f6232862f456f7e583ba81c085dd42'},
+    'p50': {'stream_index':0,'enumeration_ordinal':168,'raw_pts':168168,'pts_time':'5.605600','time_base':'1/30000','accepted_hash':'5d51447c5db413e2e49037e3802076c06b6b369ed8bc6fed998ca36d16e0f1cc'},
+    'p90': {'stream_index':0,'enumeration_ordinal':302,'raw_pts':302302,'pts_time':'10.076733','time_base':'1/30000','accepted_hash':'dd59b335099a9173fa66525be80f86cdecb1bf0d13c2c345ae113ea08a71ac4b'},
+}
+VIDEO_SHA='cc8ace8fc18280d09318d29f5b7dbcc1b7b44d986c2d83035d4421e0d927bcaa'
+TRANSFORMS=('ORIGINAL','BLUR_SIGMA4','DARK_MINUS96','BRIGHT_PLUS96')
+
+def sha_bytes(b: bytes) -> str:
+    return hashlib.sha256(b).hexdigest()
+
+def f17(x: float) -> str:
+    return format(float(x), '.17g')
+
+def load_rgb(path: Path):
+    b=path.read_bytes()
+    if len(b)!=FRAME_BYTES:
+        raise RuntimeError(f'{path}: expected {FRAME_BYTES} bytes, got {len(b)}')
+    h=sha_bytes(b)
+    arr=np.frombuffer(b,dtype=np.uint8).reshape((HEIGHT,WIDTH,3)).copy()
+    return arr,h
+
+def transform(src, name):
+    if name=='ORIGINAL':
+        return src.copy(), 'identity'
+    if name=='BLUR_SIGMA4':
+        return cv2.GaussianBlur(src,(0,0),sigmaX=4.0,sigmaY=4.0,borderType=cv2.BORDER_DEFAULT), 'GaussianBlur(ksize=(0,0),sigmaX=4.0,sigmaY=4.0,borderType=BORDER_DEFAULT)'
+    if name=='DARK_MINUS96':
+        out=np.clip(src.astype(np.int16)-96,0,255).astype(np.uint8)
+        return out, 'astype(int16)-96;clip(0,255);astype(uint8)'
+    if name=='BRIGHT_PLUS96':
+        out=np.clip(src.astype(np.int16)+96,0,255).astype(np.uint8)
+        return out, 'astype(int16)+96;clip(0,255);astype(uint8)'
+    raise ValueError(name)
+
+def metrics(rgb):
+    if rgb.dtype!=np.uint8:
+        raise RuntimeError(f'expected uint8 RGB, got {rgb.dtype}')
+    gray=cv2.cvtColor(rgb,cv2.COLOR_RGB2GRAY)
+    if gray.dtype!=np.uint8:
+        raise RuntimeError(f'expected uint8 gray, got {gray.dtype}')
+    lap=cv2.Laplacian(gray,cv2.CV_64F,ksize=1,borderType=cv2.BORDER_DEFAULT)
+    lap_var=np.var(lap,dtype=np.float64)
+    mean_gray=np.mean(gray,dtype=np.float64)
+    black_count=int(np.count_nonzero(gray<=5))
+    white_count=int(np.count_nonzero(gray>=250))
+    black_fraction=black_count/PIXELS
+    white_fraction=white_count/PIXELS
+    return {
+        'laplacian_variance': f17(lap_var),
+        'mean_gray_intensity': f17(mean_gray),
+        'black_count': str(black_count),
+        'white_count': str(white_count),
+        'pixel_count': str(PIXELS),
+        'black_fraction': f17(black_fraction),
+        'white_fraction': f17(white_fraction),
+    }
+
+def main():
+    ap=argparse.ArgumentParser()
+    ap.add_argument('--run', required=True, choices=['A','B'])
+    ap.add_argument('--source-dir', required=True)
+    ap.add_argument('--out-csv', required=True)
+    ap.add_argument('--out-hashes', required=True)
+    args=ap.parse_args()
+    source_dir=Path(args.source_dir)
+    rows=[]
+    hashes=[]
+    for sid in ('p10','p50','p90'):
+        meta=SOURCE_META[sid]
+        src, source_hash=load_rgb(source_dir/f'{sid}.rgb')
+        if source_hash!=meta['accepted_hash']:
+            raise RuntimeError(f'{sid}: source hash mismatch {source_hash} != {meta["accepted_hash"]}')
+        state_metrics={}
+        state_hashes={}
+        state_params={}
+        for t in TRANSFORMS:
+            derived, params=transform(src,t)
+            if derived.dtype!=np.uint8 or derived.shape!=(HEIGHT,WIDTH,3):
+                raise RuntimeError(f'{sid}/{t}: contract violation {derived.dtype} {derived.shape}')
+            dh=sha_bytes(derived.tobytes(order='C'))
+            m=metrics(derived)
+            state_metrics[t]=m
+            state_hashes[t]=dh
+            state_params[t]=params
+        black_orig=float(state_metrics['ORIGINAL']['black_fraction'])
+        black_dark=float(state_metrics['DARK_MINUS96']['black_fraction'])
+        white_orig=float(state_metrics['ORIGINAL']['white_fraction'])
+        white_bright=float(state_metrics['BRIGHT_PLUS96']['white_fraction'])
+        black_response='EXERCISED_CONFIRMED' if black_dark>black_orig else ('CLIPPING_RESPONSE_NOT_EXERCISED' if black_dark==black_orig else 'DIRECTION_DECREASE')
+        white_response='EXERCISED_CONFIRMED' if white_bright>white_orig else ('CLIPPING_RESPONSE_NOT_EXERCISED' if white_bright==white_orig else 'DIRECTION_DECREASE')
+        for t in TRANSFORMS:
+            m=state_metrics[t]
+            row={
+                'experiment_id':'M2-02A-20261002-AIR3S-QUALITY-001',
+                'run_id':args.run,
+                'source_video_sha256':VIDEO_SHA,
+                'sample_id':sid,
+                'stream_index':meta['stream_index'],
+                'source_enumeration_ordinal':meta['enumeration_ordinal'],
+                'raw_pts':meta['raw_pts'],
+                'pts_time':meta['pts_time'],
+                'time_base':meta['time_base'],
+                'source_rgb24_sha256':source_hash,
+                'transform_id':t,
+                'transform_parameters':state_params[t],
+                'derived_rgb24_sha256':state_hashes[t],
+                'width':WIDTH,'height':HEIGHT,
+                'source_dtype':'uint8','derived_dtype':'uint8','gray_dtype':'uint8','laplacian_dtype':'float64',
+                'opencv_version':cv2.__version__,
+                'numpy_version':np.__version__,
+                **m,
+                'black_clipping_response_for_source':black_response,
+                'white_clipping_response_for_source':white_response,
+            }
+            rows.append(row)
+            hashes.append(f"{args.run},{sid},{t},{state_hashes[t]}")
+    fields=list(rows[0].keys())
+    with open(args.out_csv,'w',newline='',encoding='utf-8') as f:
+        w=csv.DictWriter(f,fieldnames=fields)
+        w.writeheader(); w.writerows(rows)
+    Path(args.out_hashes).write_text('\n'.join(hashes)+'\n',encoding='utf-8')
+
+if __name__=='__main__':
+    main()

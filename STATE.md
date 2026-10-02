@@ -2,11 +2,11 @@
 
 protocol: TWO-WEBAI/0.2
 project_id: MP
-state_version: 25
+state_version: 26
 goal_version: 1
 project_profile: REPO_INTEGRATION
 work_mode: AUDIT / M2_TRANSITION_PLANNING
-changed_fields: M2_02B_input_classification_precheck_authorization, state_version, next_action
+changed_fields: M2_02B_input_classification_precheck_result, expanded_native_video_inventory, DNG_ancillary_inventory, input_status, state_version, next_action
 
 ## Approved goal
 
@@ -792,18 +792,23 @@ HUMAN decides what to do with the remaining M2-02B input gap.
 
 Eight native candidate clips are now accessible, but no REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT role has been verified and no matched group has been admitted.
 
-INPUT_CLASSIFICATION_PRECHECK is HUMAN_AUTHORIZED under HUMAN-M2-02B-INPUT-CLASSIFICATION-PRECHECK-AUTH-001.
-The authorization is limited to classifying already accessible existing material and does not authorize M2-02B execution.
+INPUT_CLASSIFICATION_PRECHECK completed under HUMAN-M2-02B-INPUT-CLASSIFICATION-PRECHECK-AUTH-001.
 
-Other options:
-- provide additional already existing footage;
-- identify known condition/segment information for these files;
-- defer M2-02B.
+Result:
+M2_02B_INPUT_GAP_REPORT_003.md
 
-Execute only the authorized INPUT_CLASSIFICATION_PRECHECK on already accessible material, then stop.
-Do not calculate metrics.
+The checked representative samples do not establish any complete REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT matched set.
+M2-02B therefore remains NOT_STARTED / NOT_AUTHORIZED / BLOCKED_BY_INPUT.
+
+Next HUMAN decision may choose one of:
+- authorize a deeper condition-specific segment search inside the already checked clips;
+- provide or identify already existing natural-degradation footage/segments;
+- defer M2-02B;
+- request a separate proposal for a DNG robustness/detail-visibility experiment.
+
+Do not calculate M2-02B metrics.
 Do not collect HUMAN labels.
-Do not run formal matched-group admission or formal experiment midpoint-frame selection.
+Do not run formal matched-group admission.
 Do not execute a flight or record new material.
 Do not execute M2-02B.
 Do not execute BRISQUE, M2-03 or later work.
@@ -906,7 +911,7 @@ authorization_context_subject:
 ea3ffdd425197762490dca4cbcfbdcf85bf5c305
 
 precheck_status:
-AUTHORIZED / NOT YET COMPLETED
+COMPLETED / INPUT_GAP_REMAINS
 
 authorized_scope:
 already accessible existing Air 3S video and associated still/raw material only.
@@ -929,8 +934,75 @@ not_authorized:
 - M2-03+;
 - merge / architecture freeze / publish-release-deploy.
 
+result_report:
+M2_02B_INPUT_GAP_REPORT_003.md
+
+precheck_id:
+M2-02B-INPUT-CLASSIFICATION-PRECHECK-20261002-001
+
+checked_native_video_count:
+10
+
+checked_native_video:
+- Air3s_normal.MP4
+- Air3s_D-logM.MP4
+- Air3s_HLG.MP4
+- Air3s_D-logM(1).MP4
+- Coler_normal.MP4
+- Coler_HDR.MP4
+- Coler_D-LogM_24mm.MP4
+- Coler_D-LogM_70mm.MP4
+- Slow_24mm_4K120fps.MP4
+- Slow_70mm_4K120fps.MP4
+
+candidate_scene_clusters:
+- P1 indoor room: PROMISING / UNVERIFIED
+- P2 waterfall wide ~24 mm: PROMISING / UNVERIFIED
+- P3 waterfall tele ~70 mm: PARTIAL / UNVERIFIED
+- P4 landscape/hills: SINGLETON
+
+candidate_ref:
+- P1: Air3s_normal.MP4 — candidate only / unverified
+- P2: Coler_normal.MP4 — strongest candidate / unverified
+
+NAT_BLUR:
+NOT_ESTABLISHED in fixed representative precheck samples.
+
+NAT_DARK:
+NOT_ESTABLISHED; visible tonal differences are confounded by profile/mode.
+
+NAT_BRIGHT:
+NOT_ESTABLISHED; visible tonal differences are confounded by profile/mode.
+
+complete_plausible_four_condition_groups_in_checked_samples:
+0
+
+DNG_ancillary_material:
+HIGH_VALUE_FOR_SEPARATE_FUTURE_ROBUSTNESS_OR_DETAIL_VISIBILITY_TEST / NOT_M2_02B_INPUT_SUBSTITUTE
+
+bridge_stills:
+VISUALLY_RELEVANT_FOR_FUTURE_INSPECTION_RESEARCH / NOT_VERIFIED_NATIVE_AIR3S_VIDEO
+
+input_readiness:
+NO
+
+input_gap:
+YES — VERIFIED REF / NAT_BLUR / NAT_DARK / NAT_BRIGHT SET NOT ESTABLISHED
+
+execution:
+NOT_STARTED / NOT_AUTHORIZED / BLOCKED_BY_INPUT
+
+metrics:
+NOT_RUN
+
+human_labeling:
+NOT_RUN
+
+formal_matched_group_admission:
+NOT_RUN
+
 stop_rule:
-stop after INPUT_READINESS or INPUT_GAP_REPORT.
+precheck completed; stop pending separate HUMAN decision.
 
 
 ## M2-02B input availability check
